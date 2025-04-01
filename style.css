@@ -1,0 +1,285 @@
+:root {
+    --notecolor: #42a5c4;
+    --lanecolor: linear-gradient(to right, #abcdef, #afffff);
+    --laneborder: #000000;
+    --songlen: 5000;
+    --songtime: 30s;
+    --notegood: #e7d535;
+    --notegreat: #59f0da;
+    --noteperfect: linear-gradient(#e100ff, #b708ba);
+    --noteborder: linear-gradient(#bf57e5, #8f31b1);
+}
+body {
+    overflow: hidden;
+    margin: 0;
+}
+#objectstorer {
+    position: absolute;
+    top: -1500px;
+    left: -1500px;
+}
+#totalscoretrack {
+    top: 0.25vh;
+    left: 0.25vw;
+    font-size: 4vh;
+    position: absolute;
+}
+#totalcombotrack {
+    top: 0.25vh;
+    left: 20vw;
+    font-size: 4vh;
+    position: absolute;
+}
+#musicplayerinput {
+    top: 14vh;
+    left: 0.5vw;
+    position: absolute;
+}
+#songplayerdatainput {
+    position: absolute;
+    top: 9vh;
+    left: 72vw;
+    background-color: #fff3c6;
+}
+.noteobject {
+    width: 3vh;
+    height: 12vh;
+    border-radius: 1.5vh;
+    background-color: var(--notecolor);
+    position: absolute;
+}
+.laneobject {
+    width: 100vw;
+    height: 12vh;
+    background-image: var(--lanecolor);
+    border: 1px solid var(--laneborder);
+}
+.timeobject {
+    width: 1px;
+    background-color: black;
+    height: 48vh;
+    /* border: 1px solid black; */
+}
+.timeobjectfin {
+    position: absolute;
+}
+.indicobject {
+    width: 26px;
+    height: 12vh;
+    background-color: rgb(192, 72, 192);
+    border: 1px solid #abcdef;
+    text-align: center;
+    color: white;
+}
+.musicplayerplay {
+    position: absolute;
+    top: 9vh;
+    left: .5vw;
+    width: 6vw;
+    height: 4vh;
+}
+.musicplayerpause {
+    position: absolute;
+    top: 9vh;
+    left: 7vw;
+    width: 6vw;
+    height: 4vh;
+}
+.musicplayerseek5 {
+    position: absolute;
+    top: 9vh;
+    left: 13.5vw;
+    width: 6vw;
+    height: 4vh;
+}
+.musicplayerseek1 {
+    position: absolute;
+    top: 9vh;
+    left: 20vw;
+    width: 6vw;
+    height: 4vh;
+}
+.musicplayertrack1 {
+    position: absolute;
+    top: 9vh;
+    left: 26.5vw;
+    width: 6vw;
+    height: 4vh;
+}
+.musicplayertrack5 {
+    position: absolute;
+    top: 9vh;
+    left: 33vw;
+    width: 6vw;
+    height: 4vh;
+}
+.musicplayerexport {
+    position: absolute;
+    top: 9vh;
+    left: 39.5vw;
+    width: 6vw;
+    height: 4vh;
+}
+.musicplayerundo {
+    position: absolute;
+    top: 9vh;
+    left: 46vw;
+    width: 6vw;
+    height: 4vh;
+}
+.musicplayergrid {
+    position: absolute;
+    top: 9vh;
+    left: 52.5vw;
+    width: 6vw;
+    height: 4vh;
+}
+.musicplayergridchange {
+    position: absolute;
+    top: 9vh;
+    left: 59vw;
+    width: 6vw;
+    height: 4vh;
+}
+.musicplayerimport {
+    position: absolute;
+    top: 9vh;
+    left: 65.5vw;
+    width: 6vw;
+    height: 4vh;
+    background-color: #fff3c6;
+}
+#musicplayertime {
+    position: absolute;
+    text-align: center;
+    top: 5vh;
+    height: 3vh;
+    width: 10vw;
+    left: 45vw;
+}
+.currentTimeSlider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100vw;
+    height: 3vh;
+    background-image: var(--lanecolor);
+    outline: none;
+    margin: 0;
+    position: absolute;
+    top: 5vh;
+    left: 0;
+    z-index: -1;
+}
+.currentTimeSlider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 3vh;
+    aspect-ratio: 1/1;
+    background-color: var(--notecolor);
+    padding: 0;
+    width: 3vh;
+}
+.currentTimeSlider::-moz-range-thumb {
+    height: 3vh;
+    aspect-ratio: 1/1;
+    background-color: var(--notecolor);
+}
+.lane1 {
+    position: absolute;
+    top: 20vh;
+    left: 0;
+}
+.lane2 {
+    position: absolute;
+    top: 32vh;
+    left: 0;
+}
+.lane3 {
+    position: absolute;
+    top: 44vh;
+    left: 0;
+}
+.lane4 {
+    position: absolute;
+    top: 56vh;
+    left: 0;
+}
+#indic1 {
+    position: absolute;
+    top: 20vh;
+    left: 80px;
+}
+#indic2 {
+    position: absolute;
+    top: 32vh;
+    left: 80px;
+}
+#indic3 {
+    position: absolute;
+    top: 44vh;
+    left: 80px;
+}
+#indic4 {
+    position: absolute;
+    top: 56vh;
+    left: 80px;
+}
+.indicactive {
+    background-color: yellow;
+}
+.noteobjectactive {
+    background-color: var(--notegood);
+}
+.noteobjectsuper {
+    background-color: var(--notegreat);
+}
+.noteobjectperfect {
+    background-image: var(--noteperfect);
+}
+.noteobjecthit {
+    opacity: 0 !important;
+    background-color: white !important;
+}
+.noteobjectselected {
+    background-color: yellowgreen;
+}
+/* .rightclickmenu {
+
+} */
+.contextitem {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+}
+.context1 {
+    left: 0px;
+    background-color: rgb(213, 213, 213);
+    border-radius: 5px;
+}
+.context2 {
+    left: 30px;
+    top: -30px;
+    border-radius: 5px;
+}
+.context3 {
+    left: 60px;
+    top: -60px;
+    background-color: rgb(213, 213, 213);
+    border-radius: 5px;
+}
+.exportmaintext {
+    position: absolute;
+    overflow-y: scroll;
+    overflow-x: wrap;
+    word-break: break-all;
+    height: 25vh;
+    width: 50vw;
+    left: 25vw;
+    bottom: 1vh;
+}
+.songdataobject {
+    position: absolute;
+    top: -1000px;
+    left: -1000px;
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js" integrity="sha256-/H4YS+7aYb9kJ5OKhFYPUjSJdrtV6AeyJOtTkw6X72o=" crossorigin="anonymous"></script>
+        <script src="save.js"></script>
+        <script src="MRG_Song_twilight_test_v0.0.0.txt"></script>
+        <!-- <object class="songdataobject" data="MRG_Song_twilight_test_v0.0.0.txt" id="MRG_Song_twilight_test"></object> -->
+    </head>
+    <body>
+        <div id="objectstorer">
+            <div class="noteobject"></div>
+            <div class="laneobject"></div>
+            <div class="indicobject"></div>
+            <div class="timeobject"></div>
+            <div class="contextobject"></div>
+        </div>
+        <div id="totalscoretrack">Score: 0</div>
+        <div id="totalcombotrack">Combo: 0</div>
+        <input type="file" accept=".mp3" id="musicplayerinput">
+        <input type="file" accept=".txt" id="songplayerdatainput">
+        <audio id="musicplayer" src="" ontimeupdate="sldTimeUpdate()">
+            <source src="" id="musicplayersrc">
+            Your browser does not support this element 3:
+        </audio>
+        <div>
+            <button onclick="playSong()" class="musicplayerplay">Play</button>
+            <button onclick="pauseSong()" class="musicplayerpause">Pause</button>
+            <button onclick="seekSong(5)" class="musicplayerseek5">+5s</button>
+            <button onclick="seekSong(1)" class="musicplayerseek1">+1s</button>
+            <button onclick="trackSong(1)" class="musicplayertrack1">-1s</button>
+            <button onclick="trackSong(5)" class="musicplayertrack5">-5s</button>
+            <button onclick="fullExport()" class="musicplayerexport">Export</button>
+            <button onclick="undoLast()" class="musicplayerundo">Undo</button>
+            <button onclick="toggleGrid()" class="musicplayergrid"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-grid-3x3" viewBox="0 0 16 16">
+                <path d="M0 1.5A1.5 1.5 0 0 1 1.5 0h13A1.5 1.5 0 0 1 16 1.5v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5zM1.5 1a.5.5 0 0 0-.5.5V5h4V1zM5 6H1v4h4zm1 4h4V6H6zm-1 1H1v3.5a.5.5 0 0 0 .5.5H5zm1 0v4h4v-4zm5 0v4h3.5a.5.5 0 0 0 .5-.5V11zm0-1h4V6h-4zm0-5h4V1.5a.5.5 0 0 0-.5-.5H11zm-1 0V1H6v4z"/>
+              </svg> ON</button>
+            <button onclick="adjustGrid()" class="musicplayergridchange">1/8 sec</button>
+            <button onclick="fullImport()" class="musicplayerimport">Import</button>
+            <input type="range" min="0" max="100" value="0" step="1" class="currentTimeSlider" id="currentTimeSlider">
+            <div id="musicplayertime">0:00 / 0:00</div>
+        </div>
+
+        <script src="notes.js"></script>
+        <div id="noteholder"></div>
+        <div id="secondholder"></div>
+        <script src="engine.js"></script>
+    </body>
+</html>
