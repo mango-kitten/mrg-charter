@@ -6,12 +6,35 @@
     --songtime: 30s;
     --notegood: #e7d535;
     --notegreat: #59f0da;
-    --noteperfect: linear-gradient(#e100ff, #b708ba);
+    --noteperfect: linear-gradient(to right, #e100ff, #b708ba);
     --noteborder: linear-gradient(#bf57e5, #8f31b1);
+    --pulsestart: black;
+    --pulsemid: white;
+    --lanegradientstart: linear-gradient(to bottom, var(--pulsestart), var(--pulsestart), var(--pulsestart), var(--pulsemid), var(--pulsestart), var(--pulsestart), var(--pulsestart));
+    --lanegradientstep1: linear-gradient(to bottom, var(--pulsestart), var(--pulsestart), var(--pulsestart), var(--pulsemid), var(--pulsemid), var(--pulsestart), var(--pulsestart), var(--pulsestart));
+    --lanegradientstep2: linear-gradient(to bottom, var(--pulsestart), var(--pulsestart), var(--pulsestart), var(--pulsemid), var(--pulsemid), var(--pulsemid), var(--pulsestart), var(--pulsestart), var(--pulsestart));
+    --lanegradientstep3: linear-gradient(to bottom, var(--pulsestart), var(--pulsestart), var(--pulsestart), var(--pulsemid), var(--pulsemid), var(--pulsemid), var(--pulsemid), var(--pulsestart), var(--pulsestart), var(--pulsestart));
+    --lanegradientstep4: linear-gradient(to bottom, var(--pulsestart), var(--pulsestart), var(--pulsestart), var(--pulsemid), var(--pulsemid), var(--pulsemid), var(--pulsemid), var(--pulsemid), var(--pulsestart), var(--pulsestart), var(--pulsestart));
+    --lanegradientend: linear-gradient(to bottom, var(--pulsestart), var(--pulsestart), var(--pulsestart), var(--pulsemid), var(--pulsemid), var(--pulsemid), var(--pulsemid), var(--pulsemid), var(--pulsemid), var(--pulsemid), var(--pulsestart), var(--pulsestart), var(--pulsestart));
+}
+@keyframes lane-glow {
+    0% {background-image: var(--lanegradientstart);}
+    2% {background-image: var(--lanegradientstep1);}
+    5% {background-image: var(--lanegradientstep2);}
+    8% {background-image: var(--lanegradientstep3);}
+    10% {background-image: var(--lanegradientstep4);}
+    13% {background-image: var(--lanegradientend);}
+    15% {background-image: var(--lanegradientstep4);}
+    18% {background-image: var(--lanegradientstep3);}
+    20% {background-image: var(--lanegradientstep2);}
+    23% {background-image: var(--lanegradientstep1);}
+    25% {background-image: var(--lanegradientstart);}
+    100% {background-image: var(--lanegradientstart);}
 }
 body {
     overflow: hidden;
     margin: 0;
+    background-color: black;
 }
 #objectstorer {
     position: absolute;
@@ -53,6 +76,12 @@ body {
     height: 12vh;
     background-image: var(--lanecolor);
     border: 1px solid var(--laneborder);
+}
+.lanebeat {
+    animation: infinite lane-glow 4s;
+}
+.lanebeatdrop {
+    animation: forwards lane-glow 4s;
 }
 .timeobject {
     width: 1px;

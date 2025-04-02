@@ -111,7 +111,7 @@ function resetCombo() {
 
 for (let i=1; i<=4; i++) {
     let object = document.body.appendChild(document.getElementById("objectstorer").getElementsByClassName("laneobject")[0].cloneNode())
-    object.classList = `laneobject lane${i}`
+    object.classList = `laneobject lanebeat lane${i}`
     object = document.body.appendChild(document.getElementById("objectstorer").getElementsByClassName("indicobject")[0].cloneNode())
     object.id = `indic${i}`
     object.innerHTML = `<br><br>${savedata.userkeys[i-1]}`

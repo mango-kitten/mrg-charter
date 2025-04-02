@@ -552,5 +552,18 @@ function readAllSongs() {
         console.log(newsongdata)
     }
 }
-
+// woah this was line 555 at one point in time. maybe itll stay that way
 readAllSongs()
+
+
+function beatDrop() { // DOESNT WORK YET
+    let lanes = document.getElementsByClassName("laneobject")
+    for (let i=0;i<lanes.length;i++) {
+        lanes[i].classList = `laneobject lane${i} lanebeatdrop`
+    }
+    setTimeout( function () {
+        for (let i=0;i<lanes.length;i++) {
+            lanes[i].classList = `laneobject lane${i} lanebeat`
+        }
+    }, 1000)
+}
