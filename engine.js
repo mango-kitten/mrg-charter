@@ -11,8 +11,11 @@ let songdata = {
     ]
 }
 let pixelspersecond = 300
+let noteforgiveness = 0.4
 let startdelay = 0
 let enginever = "0.0.0"
+
+let combomulti = 1
 
 // https://stackoverflow.com/a/34348306
 let mousepos = []
@@ -85,7 +88,7 @@ function undoLast() {
         } else if (lastactions[newestaction][0] == 3) {
             let oldtop = ((0.08*window.innerHeight)+(lastactions[newestaction][1][1]*window.innerHeight*0.12))
             let noteslen = document.getElementById("noteholder").children.length
-            const noteobj = document.getElementById(`noteholder`).appendChild(document.getElementsByClassName("noteobject")[0].cloneNode())
+            const noteobj = document.getElementById(`noteholder`).appendChild(document.getElementsByClassName("noteobject")[0].cloneNode(true))
             noteobj.style.top = `${oldtop}px`
             noteobj.style.left = `${lastactions[newestaction][1][0]}px`
             noteobj.id = `note${noteslen}`
@@ -230,7 +233,7 @@ document.addEventListener('mousedown', function (event) {
                     } else {
                         if (lanein != 0) {
                             let noteslen = document.getElementById("noteholder").children.length
-                            const noteobj = document.getElementById(`noteholder`).appendChild(document.getElementsByClassName("noteobject")[0].cloneNode())
+                            const noteobj = document.getElementById(`noteholder`).appendChild(document.getElementsByClassName("noteobject")[0].cloneNode(true))
                             noteobj.style.top = `${topofnote}px`
                             noteobj.style.left = `${leftofnote}px`
                             noteobj.id = `note${noteslen}`
@@ -293,9 +296,9 @@ setInterval( function () {
             if (nodes[i].classList == "noteobject noteobjecthit") {
                 // unhelpful comments? thats the whole point
             } else {
-                if (Number(nodes[i].style.left.replace("px","")) > (93)-(pixelspersecond*0.2) && Number(nodes[i].style.left.replace("px","")) < (93)+(pixelspersecond*0.2)) {
+                if (Number(nodes[i].style.left.replace("px","")) > (93)-(pixelspersecond*(noteforgiveness/2)) && Number(nodes[i].style.left.replace("px","")) < (93)+(pixelspersecond*(noteforgiveness/2))) {
                     nodes[i].classList = `noteobject noteobjectactive noteobjectsuper`
-                } else if (Number(nodes[i].style.left.replace("px","")) > (93)-(pixelspersecond*0.4) && Number(nodes[i].style.left.replace("px","")) < (93)+(pixelspersecond*0.4)) {
+                } else if (Number(nodes[i].style.left.replace("px","")) > (93)-(pixelspersecond*noteforgiveness) && Number(nodes[i].style.left.replace("px","")) < (93)+(pixelspersecond*noteforgiveness)) {
                     nodes[i].classList = `noteobject noteobjectactive`
                 } else {
                     if (nodes[i].classList == "noteobject noteobjectactive") {
@@ -324,20 +327,23 @@ function keyFired(keyindex) {
     document.getElementById(`indic${keyindex}`).classList = `indicobject indicactive`
     let noteattempt = 0
     let notefound = undefined
-    while (notefound == undefined) {
-        let notetesting = document.getElementsByClassName("noteobjectactive")[noteattempt]
-        if (notetesting) {
-            if (Number(songdata.songs[songplaying][1][Number(notetesting.id.replace("note",""))][1]) == Number(keyindex)) {
-                notefound = document.getElementsByClassName("noteobjectactive")[noteattempt]
+    let availnotes = document.getElementsByClassName("noteobjectactive")
+    let closestpos = 10000000
+    if (availnotes.length > 0) {
+        for (let i=0;i<availnotes.length;i++) {
+            if (Number(songdata.songs[songplaying][1][Number(availnotes[i].id.replace("note",""))][1]) == Number(keyindex)) {
+                if (Number(availnotes[i].style.left.replace("px","")) < closestpos) {
+                    notefound = availnotes[i]
+                    closestpos = Number(availnotes[i].style.left.replace("px",""))
+                }
             }
-        } else {
-            notefound = "None"
         }
-        noteattempt = noteattempt + 1
+    } else {
+            notefound = "None"
     }
     if (notefound != "None") {
         notefound.classList = "noteobject noteobjecthit"
-        changeScore(((pixelspersecond*0.4)- Math.abs(Number(notefound.style.left.replace("px",""))-70))*(800/70)) // where the magic happens (future me doesnt know how the fuck this part works)
+        changeScore(((((pixelspersecond*noteforgiveness)- Math.abs(Number(notefound.style.left.replace("px",""))-93))*(1/(pixelspersecond*(noteforgiveness/830)))) + 600)*combomulti) // where the magic happens (future me doesnt know how the fuck this part works)
         increaseCombo()
     } else {
         console.log("There are no available notes in this lane!")
@@ -399,23 +405,23 @@ let contextmenuonid = ""
 // https://stackoverflow.com/a/4909312
 if (document.addEventListener) {
     document.addEventListener('contextmenu', function(e) {
-        if (e.target.id.includes("note")) {
-            contextmenuonid = e.target.id
+        if (e.target.parentElement.parentElement.id.includes("note")) {
+            contextmenuonid = e.target.parentElement.parentElement.id
             // I FOUND THE BUG <- this is staying in the code
-            contextmenuonvals = [songdata.songs[songplaying][1][Number(e.target.id.replace("note",""))][0], songdata.songs[songplaying][1][Number(e.target.id.replace("note",""))][1]]
-            contextmenuelement.style.left = `${e.target.style.left}`
-            contextmenuelement.style.top = `${e.target.style.top}`
+            contextmenuonvals = [songdata.songs[songplaying][1][Number(e.target.parentElement.parentElement.id.replace("note",""))][0], songdata.songs[songplaying][1][Number(e.target.parentElement.parentElement.id.replace("note",""))][1]]
+            contextmenuelement.style.left = `${e.target.parentElement.parentElement.style.left}`
+            contextmenuelement.style.top = `${e.target.parentElement.parentElement.style.top}`
         } 
         e.preventDefault();
     }, false);
 } else {
     document.attachEvent('oncontextmenu', function() { // might not work :(
         window.event.returnValue = false;
-        if (window.event.target.id.includes("note")) {
-            contextmenuonid = window.event.target.id
-            contextmenuonvals = [Number(window.event.target.style.left.replace("px","")), songdata.songs[songplaying][1][Number(window.event.target.id.replace("note",""))][1]]
-            contextmenuelement.style.left = `${window.event.target.style.left}`
-            contextmenuelement.style.top = `${window.event.target.style.top}`
+        if (window.event.target.parentElement.parentElement.id.includes("note")) {
+            contextmenuonid = window.event.target.parentElement.parentElement.id
+            contextmenuonvals = [Number(window.event.target.parentElement.parentElement.style.left.replace("px","")), songdata.songs[songplaying][1][Number(window.event.target.parentElement.parentElement.id.replace("note",""))][1]]
+            contextmenuelement.style.left = `${window.event.target.parentElement.parentElement.style.left}`
+            contextmenuelement.style.top = `${window.event.target.parentElement.parentElement.style.top}`
         }
     });
 }
@@ -525,7 +531,7 @@ function buildNotes() {
     for (let i=0;i<songdata.songs[songplaying][1].length;i++) {
         let noteslen = document.getElementById("noteholder").children.length
         let topofnote = ((0.08*window.innerHeight)+(songdata.songs[songplaying][1][i][1]*window.innerHeight*0.12))
-        const noteobj = document.getElementById(`noteholder`).appendChild(document.getElementsByClassName("noteobject")[0].cloneNode())
+        const noteobj = document.getElementById(`noteholder`).appendChild(document.getElementsByClassName("noteobject")[0].cloneNode(true))
         noteobj.style.top = `${topofnote}px`
         noteobj.style.left = `${songdata.songs[songplaying][1][i][0]}px`
         noteobj.id = `note${noteslen}`
@@ -567,3 +573,9 @@ function beatDrop() { // DOESNT WORK YET
         }
     }, 1000)
 }
+
+function resizeNotes() {
+    document.getElementsByClassName("notepolygon")[0].setAttribute("points",`0,${0.06*window.innerHeight} ${0.015*window.innerHeight},0 ${0.03*window.innerHeight},${0.06*window.innerHeight} ${0.015*window.innerHeight},${0.12*window.innerHeight}`)
+}
+window.onresize = resizeNotes;
+resizeNotes()

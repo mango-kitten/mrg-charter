@@ -95,6 +95,7 @@ function changeScore(added) {
     //let noisevals = scoreNoise(Math.round(Math.random()*5)+2)
     gamedata.score = gamedata.score + Math.floor(added)
     document.getElementById("totalscoretrack").innerHTML = `Score: ${gamedata.score}`
+    console.log(added)
 }
 function resetScore() {
     gamedata.score = 0
@@ -102,11 +103,13 @@ function resetScore() {
 }
 function increaseCombo() {
     gamedata.combo = gamedata.combo + 1
-    document.getElementById("totalcombotrack").innerHTML = `Combo: ${gamedata.combo}`
+    combomulti = (1+(Math.sqrt(gamedata.combo)*0.02))
+    document.getElementById("totalcombotrack").innerHTML = `Combo: ${gamedata.combo} (x${Math.floor(combomulti*100)/100})`
 }
 function resetCombo() {
     gamedata.combo = 0
-    document.getElementById("totalcombotrack").innerHTML = `Combo: ${gamedata.combo}`
+    combomulti = 1
+    document.getElementById("totalcombotrack").innerHTML = `Combo: ${gamedata.combo} (x${Math.floor(combomulti*100)/100})`
 }
 
 for (let i=1; i<=4; i++) {

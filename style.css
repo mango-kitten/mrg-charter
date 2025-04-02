@@ -2,8 +2,6 @@
     --notecolor: #42a5c4;
     --lanecolor: linear-gradient(to right, #abcdef, #afffff);
     --laneborder: #000000;
-    --songlen: 5000;
-    --songtime: 30s;
     --notegood: #e7d535;
     --notegreat: #59f0da;
     --noteperfect: linear-gradient(to right, #e100ff, #b708ba);
@@ -35,6 +33,7 @@ body {
     overflow: hidden;
     margin: 0;
     background-color: black;
+    color: white;
 }
 #objectstorer {
     position: absolute;
@@ -68,7 +67,8 @@ body {
     width: 3vh;
     height: 12vh;
     border-radius: 1.5vh;
-    background-color: var(--notecolor);
+    /* background-color: var(--notecolor); */
+    fill: var(--notecolor);
     position: absolute;
 }
 .laneobject {
@@ -257,13 +257,16 @@ body {
     background-color: yellow;
 }
 .noteobjectactive {
-    background-color: var(--notegood);
+    /* background-color: var(--notegood); */
+    fill: var(--notegood);
 }
 .noteobjectsuper {
-    background-color: var(--notegreat);
+    /* background-color: var(--notegreat); */
+    fill: var(--notegreat);
 }
 .noteobjectperfect {
-    background-image: var(--noteperfect);
+    /* background-image: var(--noteperfect); */
+    fill: var(--noteperfect);
 }
 .noteobjecthit {
     opacity: 0 !important;
