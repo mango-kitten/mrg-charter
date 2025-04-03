@@ -1,9 +1,9 @@
 :root {
-    --notecolor: #42a5c4;
-    --lanecolor: linear-gradient(to right, #abcdef, #afffff);
+    --notecolor: #b66700;
+    --lanecolor: linear-gradient(to right, #ffad5b, #ffa034);
     --laneborder: #000000;
-    --notegood: #e7d535;
-    --notegreat: #59f0da;
+    --notegood: #d27802;
+    --notegreat: #f58b00;
     --noteperfect: linear-gradient(to right, #e100ff, #b708ba);
     --noteborder: linear-gradient(#bf57e5, #8f31b1);
     --pulsestart: black;
@@ -69,6 +69,9 @@ body {
     border-radius: 1.5vh;
     /* background-color: var(--notecolor); */
     fill: var(--notecolor);
+    /* stroke: var(--notecolor);
+    stroke-width: 1;
+    stroke-linejoin: round; */
     position: absolute;
 }
 .laneobject {
