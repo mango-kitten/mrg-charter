@@ -29,6 +29,14 @@
     25% {background-image: var(--lanegradientstart);}
     100% {background-image: var(--lanegradientstart);}
 }
+@keyframes beat-glow {
+    0% {background-image: var(--lanegradientend);}
+    10% {background-image: var(--lanegradientstep4);}
+    25% {background-image: var(--lanegradientstep3);}
+    40% {background-image: var(--lanegradientstep2);}
+    60% {background-image: var(--lanegradientstep1);}
+    100% {background-image: var(--lanegradientstart);}
+}
 body {
     overflow: hidden;
     margin: 0;
@@ -84,7 +92,7 @@ body {
     animation: infinite lane-glow 4s;
 }
 .lanebeatdrop {
-    animation: forwards lane-glow 4s;
+    animation: forwards beat-glow 0.5s;
 }
 .timeobject {
     width: 1px;
@@ -92,8 +100,20 @@ body {
     height: 48vh;
     /* border: 1px solid black; */
 }
+.beatdropobject {
+    width: 1px;
+    background-color: rgb(255, 0, 0);
+    height: 48vh;
+    /* border: 1px solid black; */
+}
 .timeobjectfin {
     position: absolute;
+}
+.beatdropobjectfin {
+    position: absolute;
+}
+.beatdropreached {
+    opacity: 0;
 }
 .indicobject {
     width: 26px;
@@ -286,6 +306,7 @@ body {
     width: 30px;
     height: 30px;
     text-align: center;
+    color: black;
 }
 .context1 {
     left: 0px;

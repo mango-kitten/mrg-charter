@@ -6,14 +6,15 @@ let songdata = {
             0,
             [],
             "",
-            15
+            15,
+            []
         ]
     ]
 }
 let pixelspersecond = 300
 let noteforgiveness = 0.4
 let startdelay = 0
-let enginever = "0.0.0"
+let enginever = "0.0.1"
 
 let combomulti = 1
 
@@ -46,6 +47,10 @@ function seekSong(seconds) {
     for (let i=0;i<prehitnotes.length;i++) {
         prehitnotes[i].classList = "noteobject"
     }
+    let prehitbeats = document.getElementsByClassName("beatdropreached")
+    for (let i=0;i<prehitbeats.length;i++) {
+        prehitbeats[i].classList = "beatdropobject beatdropobjectfin"
+    }
     resetScore()
     resetCombo()
 }
@@ -60,8 +65,15 @@ function trackSong(seconds) {
     for (let i=0;i<prehitnotes.length;i++) {
         prehitnotes[i].classList = "noteobject"
     }
+    let prehitbeats = document.getElementsByClassName("beatdropreached")
+    for (let i=0;i<prehitbeats.length;i++) {
+        prehitbeats[i].classList = "beatdropobject beatdropobjectfin"
+    }
     resetScore()
     resetCombo()
+}
+function alertNoSong() {
+    alert("You have not uploaded a song! Please upload one to perfom any other actions.")
 }
 // mangos first useful comment on the next line
 let lastactions = [] // [actiontype, oldpos, newpos, elemid] actiontype 0 = place, actiontype 1 = l/r translation, actiontype 2 = lane shift, actiontype 3 = note deletion
@@ -94,6 +106,12 @@ function undoLast() {
             noteobj.id = `note${noteslen}`
             notepx = Number(noteobj.style.left.replace("px","")) + ((Number(document.getElementById("musicplayer").currentTime)+startdelay)*pixelspersecond)
             songdata.songs[songplaying][1].push([notepx, lastactions[newestaction][1][1]])
+            lastactions.pop()
+        } else if (lastactions[newestaction][0] == 4) {
+            let deletionnum = document.getElementById("secondholder").getElementsByClassName("beatdropobject").length
+            let beatdeleted = document.getElementById("secondholder").getElementsByClassName("beatdropobject")[deletionnum-1]
+            beatdeleted.remove()
+            songdata.songs[songplaying][4].pop()
             lastactions.pop()
         }
     }
@@ -280,8 +298,10 @@ document.addEventListener('mousedown', function (event) {
     } else {
         if (document.getElementById("musicplayerinput").files[0]) {
             // nobody tell her (mango) about the ! operator
+        } else if (event.target.classList.value.includes("lane")) {
+            alertNoSong()
         } else {
-            console.log("please upload a song before adding notes")
+
         }
     }
     exportMenu()
@@ -318,7 +338,16 @@ setInterval( function () {
     nodes = document.getElementById("secondholder").children
     if (nodes.length > 0) {
         for (let i=0;i<nodes.length;i++) {
-            nodes[i].style.left = `${(Number(nodes[i].id.replace("second","")*pixelspersecond)+indicOffset)-(Number(document.getElementById("musicplayer").currentTime)*pixelspersecond)}px` // ough so much logic
+            if (nodes[i].id.includes("second")) {
+                nodes[i].style.left = `${(Number(nodes[i].id.replace("second","")*pixelspersecond)+indicOffset)-(Number(document.getElementById("musicplayer").currentTime)*pixelspersecond)}px` // ough so much logic
+            } else if (nodes[i].id.includes("beat")) {
+                nodes[i].style.left = `${(songdata.songs[songplaying][4][Number(nodes[i].id.replace("beat",""))])-(Number(document.getElementById("musicplayer").currentTime)*pixelspersecond)}px`
+                let beatdropchecker = Math.floor((songdata.songs[songplaying][4][Number(nodes[i].id.replace("beat",""))]-(Number(document.getElementById("musicplayer").currentTime)*pixelspersecond)))
+                if (beatdropchecker > 90 && beatdropchecker < 95 && !nodes[i].classList.value.includes("beatdropreached")) {
+                    beatDrop()
+                    nodes[i].classList = "beatdropobject beatdropobjectfin beatdropreached"
+                }
+            }
         }
     }
 }, 30)
@@ -355,9 +384,7 @@ function keyReleased(keyindex) {
 }
 
 
-// function checkHover(element) {
-//     return element.matches(':hover')
-// }
+let contextmenuvals = [`<div class="contextitem context1" onclick="moveNote()">&#8596;</div><div class="contextitem context2" onclick="changeLane()">&#8597;</div><div class="contextitem context3" onclick="deleteNote()">--</div>`, `<div class="contextitem context1" onclick="insertBeatDrop()">&odot;</div>`]
 
 const contextmenuelement = document.createElement("div")
 contextmenuelement.id = "rightclickmenu"
@@ -369,7 +396,7 @@ contextmenuelement.style.width = "90px"
 contextmenuelement.style.height = "30px"
 contextmenuelement.style.backgroundColor = "white"
 contextmenuelement.style.borderRadius = "5px"
-contextmenuelement.innerHTML = `<div class="contextitem context1" onclick="moveNote()">&#8596;</div><div class="contextitem context2" onclick="changeLane()">&#8597;</div><div class="contextitem context3" onclick="deleteNote()">--</div>`
+contextmenuelement.innerHTML = contextmenuvals[0]
 document.body.appendChild(contextmenuelement)
 
 
@@ -399,31 +426,61 @@ function deleteNote() {
     }
     pushAction(3, oldnotevals, [-1, -1], contextmenuonid)
 }
+function insertBeatDrop() {
+    let existbeatobjects = document.getElementById("secondholder").getElementsByClassName("beatdropobject")
+    let leftofnote
+    if (gridon == 1) {
+        leftofnote = roundDownNearest(indicOffset - nearestSecondOff, gridscale, contextmenuonpos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+    } else {
+        leftofnote = mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+    }
+    let object = document.getElementById("secondholder").appendChild(document.getElementById("objectstorer").getElementsByClassName("beatdropobject")[0].cloneNode())
+    object.style.left = `${leftofnote}px`
+    object.style.top = `20vh`
+    object.classList = "beatdropobject beatdropobjectfin"
+    object.id = `beat${existbeatobjects.length-1}`
+    songdata.songs[songplaying][4].push(leftofnote)
+    contextmenuelement.style.left = `-1000px`
+    contextmenuelement.style.top = `-1000px`
+    pushAction(4, [-1, -1], [leftofnote, 20*window.innerHeight], `beat${existbeatobjects.length-1}`)
+}
 
 let contextmenuonvals = []
+let contextmenuonpos = []
 let contextmenuonid = ""
 // https://stackoverflow.com/a/4909312
 if (document.addEventListener) {
     document.addEventListener('contextmenu', function(e) {
-        if (e.target.parentElement.parentElement.id.includes("note")) {
-            contextmenuonid = e.target.parentElement.parentElement.id
-            // I FOUND THE BUG <- this is staying in the code
-            contextmenuonvals = [songdata.songs[songplaying][1][Number(e.target.parentElement.parentElement.id.replace("note",""))][0], songdata.songs[songplaying][1][Number(e.target.parentElement.parentElement.id.replace("note",""))][1]]
-            contextmenuelement.style.left = `${e.target.parentElement.parentElement.style.left}`
-            contextmenuelement.style.top = `${e.target.parentElement.parentElement.style.top}`
-        } 
         e.preventDefault();
+        if (document.getElementById("musicplayerinput").files[0]) {
+            if (e.target.parentElement.parentElement.id.includes("note")) {
+                contextmenuonid = e.target.parentElement.parentElement.id
+                contextmenuelement.innerHTML = contextmenuvals[0]
+                // I FOUND THE BUG <- this is staying in the code
+                contextmenuonvals = [songdata.songs[songplaying][1][Number(e.target.parentElement.parentElement.id.replace("note",""))][0], songdata.songs[songplaying][1][Number(e.target.parentElement.parentElement.id.replace("note",""))][1]]
+                contextmenuelement.style.left = `${e.target.parentElement.parentElement.style.left}`
+                contextmenuelement.style.top = `${e.target.parentElement.parentElement.style.top}`
+            } else if (e.target.classList.value.includes("lane")) {
+                contextmenuonpos = [roundDownNearest(indicOffset - nearestSecondOff, gridscale, mousepos[0]), mousepos[1]]
+                contextmenuelement.innerHTML = contextmenuvals[1]
+                contextmenuelement.style.left = `${contextmenuonpos[0]}px`
+                contextmenuelement.style.top = `${contextmenuonpos[1]}px`
+            }
+        } else {
+            alertNoSong()
+        }
     }, false);
 } else {
-    document.attachEvent('oncontextmenu', function() { // might not work :(
-        window.event.returnValue = false;
-        if (window.event.target.parentElement.parentElement.id.includes("note")) {
-            contextmenuonid = window.event.target.parentElement.parentElement.id
-            contextmenuonvals = [Number(window.event.target.parentElement.parentElement.style.left.replace("px","")), songdata.songs[songplaying][1][Number(window.event.target.parentElement.parentElement.id.replace("note",""))][1]]
-            contextmenuelement.style.left = `${window.event.target.parentElement.parentElement.style.left}`
-            contextmenuelement.style.top = `${window.event.target.parentElement.parentElement.style.top}`
-        }
-    });
+    alert("This version of browser is not supported with the context menu! Please update your browser to use this software.")
+    // document.attachEvent('oncontextmenu', function() { // might not work :(
+    //     window.event.returnValue = false;
+    //     if (window.event.target.parentElement.parentElement.id.includes("note")) {
+    //         contextmenuonid = window.event.target.parentElement.parentElement.id
+    //         contextmenuonvals = [Number(window.event.target.parentElement.parentElement.style.left.replace("px","")), songdata.songs[songplaying][1][Number(window.event.target.parentElement.parentElement.id.replace("note",""))][1]]
+    //         contextmenuelement.style.left = `${window.event.target.parentElement.parentElement.style.left}`
+    //         contextmenuelement.style.top = `${window.event.target.parentElement.parentElement.style.top}`
+    //     }
+    // });
 }
 
 const exportelement = document.createElement("div")
@@ -562,7 +619,7 @@ function readAllSongs() {
 readAllSongs()
 
 
-function beatDrop() { // DOESNT WORK YET
+function beatDrop() { // finally works
     let lanes = document.getElementsByClassName("laneobject")
     for (let i=0;i<lanes.length;i++) {
         lanes[i].classList = `laneobject lane${i} lanebeatdrop`
@@ -575,7 +632,12 @@ function beatDrop() { // DOESNT WORK YET
 }
 
 function resizeNotes() {
-    document.getElementsByClassName("notepolygon")[0].setAttribute("points",`0,${0.06*window.innerHeight} ${0.015*window.innerHeight},0 ${0.03*window.innerHeight},${0.06*window.innerHeight} ${0.015*window.innerHeight},${0.12*window.innerHeight}`)
+    for (let i=0;i<document.getElementsByClassName("notepolygon").length;i++) {
+        document.getElementsByClassName("notepolygon")[i].setAttribute("points",`0,${0.06*window.innerHeight} ${0.015*window.innerHeight},0 ${0.03*window.innerHeight},${0.06*window.innerHeight} ${0.015*window.innerHeight},${0.12*window.innerHeight} 0,${0.06*window.innerHeight}`)
+        if (i>0) {
+            document.getElementsByClassName("notepolygon")[i].parentElement.parentElement.style.top = `${((0.08*window.innerHeight)+(songdata.songs[songplaying][1][Number(document.getElementsByClassName("notepolygon")[i].parentElement.parentElement.id.replace("note",""))][1]*window.innerHeight*0.12))}px`
+        }
+    }
 }
 window.onresize = resizeNotes;
 resizeNotes()
