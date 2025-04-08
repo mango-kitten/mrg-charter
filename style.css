@@ -1,5 +1,6 @@
 :root {
     --notecolor: #b66700;
+    --noteholdcolor: #dc7e02;
     --lanecolor: linear-gradient(to right, #ffad5b, #ffa034);
     --laneborder: #000000;
     --notegood: #d27802;
@@ -36,6 +37,11 @@
     40% {background-image: var(--lanegradientstep2);}
     60% {background-image: var(--lanegradientstep1);}
     100% {background-image: var(--lanegradientstart);}
+}
+@keyframes hold-stretch {
+    0% {transform: scaleY(1.2);}
+    60% {transform: scaleY(1.1);}
+    100% {transform: scaleY(1);}
 }
 body {
     overflow: hidden;
@@ -82,11 +88,48 @@ body {
     stroke-linejoin: round; */
     position: absolute;
 }
+.notelongobject {
+    height: 6vh;
+    background-color: var(--noteholdcolor);
+    position: relative;
+    top: -18vh;
+    left: 1vh;
+    z-index: -1;
+}
+.notelongheld {
+    opacity: 0.7;
+}
+.ghostnoteobject {
+    opacity: 0.5;
+    position: absolute;
+    z-index: -5;
+}
+.notelongghostobject {
+    height: 6vh;
+    background-color: var(--noteholdcolor);
+    position: relative;
+    left: 1vh;
+    z-index: -1;
+    top: 3vh;
+}
+.polylineghostobject {
+    position: relative;
+    top: -6vh;
+    fill: var(--notecolor);
+}
+.polylineobject {
+    position: relative;
+    top: -27vh;
+}
+.holdnoteboost {
+    animation: hold-stretch 0.15s forwards;
+}
 .laneobject {
     width: 100vw;
     height: 12vh;
     background-image: var(--lanecolor);
     border: 1px solid var(--laneborder);
+    z-index: -10;
 }
 .lanebeat {
     animation: infinite lane-glow 4s;
@@ -291,9 +334,15 @@ body {
     /* background-image: var(--noteperfect); */
     fill: var(--noteperfect);
 }
-.noteobjecthit {
+.noteobjecthit svg .notepolygon {
+    opacity: 0;
+    background-color: white;
+}
+.noteobjecthit .polylineobject .notepolygon {
+    opacity: 1;
+}
+.noteobjecthit .polylineobject .notepolygon.notepolygonended {
     opacity: 0 !important;
-    background-color: white !important;
 }
 .noteobjectselected {
     background-color: yellowgreen;
@@ -322,6 +371,11 @@ body {
     left: 60px;
     top: -60px;
     background-color: rgb(213, 213, 213);
+    border-radius: 5px;
+}
+.context4 {
+    left: 90px;
+    top: -90px;
     border-radius: 5px;
 }
 .exportmaintext {

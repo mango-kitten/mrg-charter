@@ -14,7 +14,7 @@ let songdata = {
 let pixelspersecond = 300
 let noteforgiveness = 0.4
 let startdelay = 0
-let enginever = "0.0.1"
+let enginever = "0.1.0"
 
 let combomulti = 1
 
@@ -294,6 +294,15 @@ document.addEventListener('mousedown', function (event) {
             noteused.classList = "noteobject"
             noteclickmoveoverride = 0
             pushAction(2, oldlanein, lanein, contextmenuonid)
+        } else if (noteclickmoveoverride == 3) {
+            let newleftnote
+            if (gridon == 1) {
+                newleftnote = roundDownNearest(indicOffset, gridscale, mousepos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+            } else {
+                newleftnote = mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+            }
+            longSetup(longusing, (newleftnote-Number(longusing.style.left.replace("px",""))))
+            noteclickmoveoverride = 0
         }
     } else {
         if (document.getElementById("musicplayerinput").files[0]) {
@@ -306,6 +315,13 @@ document.addEventListener('mousedown', function (event) {
     }
     exportMenu()
 })
+function ghostNoteTo(left, top) {
+    let ghostobj = document.getElementById("ghostnoteobject")
+    ghostobj.getElementsByClassName("notelongghostobject")[0].style.display = "none"
+    ghostobj.getElementsByClassName("polylineghostobject")[0].style.left = `0px`
+    ghostobj.style.left = `${left}px`
+    ghostobj.style.top = `${top+(window.innerHeight*0.06)}px`
+}
 
 setInterval( function () {
     nearestSecondOff = (Number(document.getElementById("musicplayer").currentTime)-Math.floor(Number(document.getElementById("musicplayer").currentTime)))*pixelspersecond
@@ -343,48 +359,129 @@ setInterval( function () {
             } else if (nodes[i].id.includes("beat")) {
                 nodes[i].style.left = `${(songdata.songs[songplaying][4][Number(nodes[i].id.replace("beat",""))])-(Number(document.getElementById("musicplayer").currentTime)*pixelspersecond)}px`
                 let beatdropchecker = Math.floor((songdata.songs[songplaying][4][Number(nodes[i].id.replace("beat",""))]-(Number(document.getElementById("musicplayer").currentTime)*pixelspersecond)))
-                if (beatdropchecker > 90 && beatdropchecker < 95 && !nodes[i].classList.value.includes("beatdropreached")) {
+                if (beatdropchecker > 80 && beatdropchecker < 105 && !nodes[i].classList.value.includes("beatdropreached")) {
                     beatDrop()
                     nodes[i].classList = "beatdropobject beatdropobjectfin beatdropreached"
                 }
             }
         }
     }
-}, 30)
-
-function keyFired(keyindex) {
-    document.getElementById(`indic${keyindex}`).classList = `indicobject indicactive`
-    let noteattempt = 0
-    let notefound = undefined
-    let availnotes = document.getElementsByClassName("noteobjectactive")
-    let closestpos = 10000000
-    if (availnotes.length > 0) {
-        for (let i=0;i<availnotes.length;i++) {
-            if (Number(songdata.songs[songplaying][1][Number(availnotes[i].id.replace("note",""))][1]) == Number(keyindex)) {
-                if (Number(availnotes[i].style.left.replace("px","")) < closestpos) {
-                    notefound = availnotes[i]
-                    closestpos = Number(availnotes[i].style.left.replace("px",""))
+    if (noteclickmoveoverride == 3) {
+        let newleftnote
+        if (gridon == 1) {
+            newleftnote = roundDownNearest(indicOffset, gridscale, mousepos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+        } else {
+            newleftnote = mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+        }
+        longGhostSetup(longusing, (newleftnote-Number(longusing.style.left.replace("px",""))))
+    } else {
+        if (document.getElementById("musicplayerinput").files[0]) {
+            let lanein = 0
+            let lanestarts = [window.innerHeight*0.2,window.innerHeight*0.32,window.innerHeight*0.44,window.innerHeight*0.56]
+            let laneends = [window.innerHeight*0.32,window.innerHeight*0.44,window.innerHeight*0.56,window.innerHeight*0.68]
+            for (let i=0;i<lanestarts.length;i++) {
+                if (mousepos[1]>=lanestarts[i] && mousepos[1]<laneends[i]) {
+                    lanein = i+1
                 }
             }
+            if (lanein > 0) {
+                let newleftnote
+                let topofnote = ((0.08*window.innerHeight)+(lanein*window.innerHeight*0.12))
+                if (gridon == 1) {
+                    newleftnote = roundDownNearest(indicOffset, gridscale, mousepos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+                } else {
+                    newleftnote = mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+                }
+                ghostNoteTo(newleftnote, topofnote)
+            } else {
+                ghostNoteTo(-1500, -1500)
+            }
         }
-    } else {
-            notefound = "None"
     }
-    if (notefound != "None") {
-        notefound.classList = "noteobject noteobjecthit"
-        changeScore(((((pixelspersecond*noteforgiveness)- Math.abs(Number(notefound.style.left.replace("px",""))-93))*(1/(pixelspersecond*(noteforgiveness/830)))) + 600)*combomulti) // where the magic happens (future me doesnt know how the fuck this part works)
-        increaseCombo()
+}, 30)
+
+// https://stackoverflow.com/a/55802040
+function touches(a, b) {
+    var aRect = a.getBoundingClientRect();
+    var bRect = b.getBoundingClientRect();
+  
+    return !(
+        ((aRect.top + aRect.height) < (bRect.top)) ||
+        (aRect.top > (bRect.top + bRect.height)) ||
+        ((aRect.left + aRect.width) < bRect.left) ||
+        (aRect.left > (bRect.left + bRect.width))
+    );
+}
+
+
+let allholdintervals = [false, false, false, false]
+function startHoldNote(keyindex, noteheld) {
+    document.getElementById(`notehold${noteheld}`).classList = "notelongobject notelongheld"
+    allholdintervals[keyindex] = setInterval( function () {
+        // console.log(songdata.songs[songplaying][1][noteheld][2] + songdata.songs[songplaying][1][noteheld][1], (Number(document.getElementById("musicplayer").currentTime)*pixelspersecond))
+        if (inholdnotes[keyindex] == true && songdata.songs[songplaying][1][noteheld][2] + songdata.songs[songplaying][1][noteheld][0] > (Number(document.getElementById("musicplayer").currentTime)*pixelspersecond)) {
+            if (touches(document.getElementById(`indic${keyindex+1}`), document.getElementById(`notehold${noteheld}`))) {
+                changeScore(143*combomulti)
+                increaseCombo()
+                let holdingonnote = document.getElementById(`notehold${noteheld}`)
+                holdingonnote.classList = "notelongobject notelongheld holdnoteboost"
+                setTimeout( function () {
+                    document.getElementById(`notehold${noteheld}`).classList = "notelongobject notelongheld"
+                }, 200)
+            }
+        }
+    }, 250)
+}
+function stopHoldNote(keyindex) {
+    clearInterval(allholdintervals[keyindex])
+
+}
+
+let inholdnotes = [false, false, false, false]
+function keyFired(keyindex) {
+    document.getElementById(`indic${keyindex}`).classList = `indicobject indicactive`
+    if (inholdnotes[keyindex-1] == true) {
+        // console.log(`key ${keyindex} is in a hold note!`)
     } else {
-        console.log("There are no available notes in this lane!")
-        resetCombo()
+        // let noteattempt = 0
+        let notefound = undefined
+        let availnotes = document.getElementsByClassName("noteobjectactive")
+        let closestpos = 10000000
+        if (availnotes.length > 0) {
+            for (let i=0;i<availnotes.length;i++) {
+                if (Number(songdata.songs[songplaying][1][Number(availnotes[i].id.replace("note",""))][1]) == Number(keyindex)) {
+                    if (Number(availnotes[i].style.left.replace("px","")) < closestpos) {
+                        notefound = availnotes[i]
+                        closestpos = Number(availnotes[i].style.left.replace("px",""))
+                    }
+                }
+            }
+        } else {
+                notefound = "None"
+        }
+        if (notefound != "None") {
+            if (songdata.songs[songplaying][1][Number(notefound.id.replace("note",""))][2] && songdata.songs[songplaying][1][Number(notefound.id.replace("note",""))][2] != 0) {
+                inholdnotes[keyindex-1] = true
+                startHoldNote(keyindex-1, Number(notefound.id.replace("note","")))
+            } else {
+            }
+            changeScore(((((pixelspersecond*noteforgiveness)- Math.abs(Number(notefound.style.left.replace("px",""))-93))*(1/(pixelspersecond*(noteforgiveness/830)))) + 600)*combomulti) // where the magic happens (future me doesnt know how the fuck this part works)
+            increaseCombo()
+            notefound.classList = "noteobject noteobjecthit"
+        } else {
+            console.log("There are no available notes in this lane!")
+            resetCombo()
+        }
     }
 }
 function keyReleased(keyindex) {
     document.getElementById(`indic${keyindex}`).classList = `indicobject`
+    inholdnotes[keyindex-1] = false
+    stopHoldNote(keyindex-1)
 }
 
 
-let contextmenuvals = [`<div class="contextitem context1" onclick="moveNote()">&#8596;</div><div class="contextitem context2" onclick="changeLane()">&#8597;</div><div class="contextitem context3" onclick="deleteNote()">--</div>`, `<div class="contextitem context1" onclick="insertBeatDrop()">&odot;</div>`]
+let contextmenuvals = [`<div class="contextitem context1" onclick="moveNote()">&#8596;</div><div class="contextitem context2" onclick="changeLane()">&#8597;</div><div class="contextitem context3" onclick="deleteNote()">--</div><div class="contextitem context4" onclick="changeLong()">&#9830;</div>`, `<div class="contextitem context1" onclick="insertBeatDrop()">&odot;</div>`]
 
 const contextmenuelement = document.createElement("div")
 contextmenuelement.id = "rightclickmenu"
@@ -392,11 +489,12 @@ contextmenuelement.classList = "rightclickmenu"
 contextmenuelement.style.position = "absolute"
 contextmenuelement.style.top = "-1000px"
 contextmenuelement.style.left = "-1000px"
-contextmenuelement.style.width = "90px"
+contextmenuelement.style.width = "120px"
 contextmenuelement.style.height = "30px"
 contextmenuelement.style.backgroundColor = "white"
 contextmenuelement.style.borderRadius = "5px"
 contextmenuelement.innerHTML = contextmenuvals[0]
+contextmenuelement.style.zIndex = "7"
 document.body.appendChild(contextmenuelement)
 
 
@@ -426,16 +524,60 @@ function deleteNote() {
     }
     pushAction(3, oldnotevals, [-1, -1], contextmenuonid)
 }
+let longusing
+function startLongSetup() {
+    noteclickmoveoverride = 3
+}
+function longSetup(selectedobject, setholdlen) {
+    // noteclickmoveoverride = 3
+    let newhold = selectedobject.appendChild(document.getElementById("objectstorer").getElementsByClassName("notelongobject")[0].cloneNode())
+    newhold.id = `notehold${contextmenuonid.replace("note","")}`
+    newhold.style.width = `${setholdlen}px`
+    let newend = selectedobject.appendChild(document.getElementById("objectstorer").getElementsByClassName("polylineobject")[0].cloneNode(true))
+    newend.style.left = `${setholdlen}px`
+    songdata.songs[songplaying][1][Number(contextmenuonid.replace("note",""))][2] = setholdlen
+    let ghostobj = document.getElementById("ghostnoteobject")
+    ghostobj.style.top = "-1500px"
+    ghostobj.style.left = "-1500px"
+}
+function longGhostSetup(selectedobject, setholdlen) {
+    let ghostobj = document.getElementById("ghostnoteobject")
+    ghostobj.getElementsByClassName("notelongghostobject")[0].style.display = "block"
+    ghostobj.style.top = selectedobject.style.top
+    ghostobj.style.left = selectedobject.style.left
+    ghostobj.getElementsByClassName("notelongghostobject")[0].style.width = `${setholdlen}px`
+    ghostobj.getElementsByClassName("polylineghostobject")[0].style.left = `${setholdlen}px`
+}
+function changeLong() {
+    let selectedobject = document.getElementById(contextmenuonid)
+    if (songdata.songs[songplaying][1][Number(contextmenuonid.replace("note",""))][2]) {
+        if (songdata.songs[songplaying][1][Number(contextmenuonid.replace("note",""))][2] != 0) {
+            document.getElementById(`notehold${contextmenuonid.replace("note","")}`).remove()
+            selectedobject.getElementsByClassName("polylineobject")[0].remove()
+            songdata.songs[songplaying][1][Number(contextmenuonid.replace("note",""))][2] = 0
+        } else if (songdata.songs[songplaying][1][Number(contextmenuonid.replace("note",""))][2] == 0) {
+            startLongSetup()
+            selectedobject.classList = "noteobject noteobjectselected"
+            longusing = selectedobject
+        }
+    } else {
+        startLongSetup()
+        selectedobject.classList = "noteobject noteobjectselected"
+        longusing = selectedobject
+    }
+    contextmenuelement.style.left = `-1000px`
+    contextmenuelement.style.top = `-1000px`
+}
 function insertBeatDrop() {
     let existbeatobjects = document.getElementById("secondholder").getElementsByClassName("beatdropobject")
     let leftofnote
     if (gridon == 1) {
-        leftofnote = roundDownNearest(indicOffset - nearestSecondOff, gridscale, contextmenuonpos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+        leftofnote = (roundDownNearest(indicOffset - nearestSecondOff, gridscale, contextmenuonpos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)) + ((Number(document.getElementById("musicplayer").currentTime)+startdelay)*pixelspersecond)
     } else {
-        leftofnote = mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+        leftofnote = (mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)) + ((Number(document.getElementById("musicplayer").currentTime)+startdelay)*pixelspersecond)
     }
     let object = document.getElementById("secondholder").appendChild(document.getElementById("objectstorer").getElementsByClassName("beatdropobject")[0].cloneNode())
-    object.style.left = `${leftofnote}px`
+    object.style.left = `${leftofnote - ((Number(document.getElementById("musicplayer").currentTime)+startdelay)*pixelspersecond)}px`
     object.style.top = `20vh`
     object.classList = "beatdropobject beatdropobjectfin"
     object.id = `beat${existbeatobjects.length-1}`
@@ -453,7 +595,7 @@ if (document.addEventListener) {
     document.addEventListener('contextmenu', function(e) {
         e.preventDefault();
         if (document.getElementById("musicplayerinput").files[0]) {
-            if (e.target.parentElement.parentElement.id.includes("note")) {
+            if (e.target.parentElement.parentElement.id.includes("note") && e.target.parentElement.parentElement.id != "noteholder") {
                 contextmenuonid = e.target.parentElement.parentElement.id
                 contextmenuelement.innerHTML = contextmenuvals[0]
                 // I FOUND THE BUG <- this is staying in the code
@@ -461,6 +603,11 @@ if (document.addEventListener) {
                 contextmenuelement.style.left = `${e.target.parentElement.parentElement.style.left}`
                 contextmenuelement.style.top = `${e.target.parentElement.parentElement.style.top}`
             } else if (e.target.classList.value.includes("lane")) {
+                contextmenuonpos = [roundDownNearest(indicOffset - nearestSecondOff, gridscale, mousepos[0]), mousepos[1]]
+                contextmenuelement.innerHTML = contextmenuvals[1]
+                contextmenuelement.style.left = `${contextmenuonpos[0]}px`
+                contextmenuelement.style.top = `${contextmenuonpos[1]}px`
+            } else if (mousepos[1] > (0.2*window.innerHeight) && mousepos[1] < (0.68*window.innerHeight)) {
                 contextmenuonpos = [roundDownNearest(indicOffset - nearestSecondOff, gridscale, mousepos[0]), mousepos[1]]
                 contextmenuelement.innerHTML = contextmenuvals[1]
                 contextmenuelement.style.left = `${contextmenuonpos[0]}px`
@@ -592,6 +739,9 @@ function buildNotes() {
         noteobj.style.top = `${topofnote}px`
         noteobj.style.left = `${songdata.songs[songplaying][1][i][0]}px`
         noteobj.id = `note${noteslen}`
+        if (songdata.songs[songplaying][1][i][2] && songdata.songs[songplaying][1][i][2] != 0) {
+            longSetup(noteobj, songdata.songs[songplaying][1][i][2])
+        }
     }
 }
 
@@ -615,7 +765,7 @@ function readAllSongs() {
         console.log(newsongdata)
     }
 }
-// woah this was line 555 at one point in time. maybe itll stay that way
+// woah this was line 555 at one point in time. maybe itll stay that way -> future mango: no it didnt
 readAllSongs()
 
 
@@ -634,7 +784,7 @@ function beatDrop() { // finally works
 function resizeNotes() {
     for (let i=0;i<document.getElementsByClassName("notepolygon").length;i++) {
         document.getElementsByClassName("notepolygon")[i].setAttribute("points",`0,${0.06*window.innerHeight} ${0.015*window.innerHeight},0 ${0.03*window.innerHeight},${0.06*window.innerHeight} ${0.015*window.innerHeight},${0.12*window.innerHeight} 0,${0.06*window.innerHeight}`)
-        if (i>0) {
+        if (i>1) {
             document.getElementsByClassName("notepolygon")[i].parentElement.parentElement.style.top = `${((0.08*window.innerHeight)+(songdata.songs[songplaying][1][Number(document.getElementsByClassName("notepolygon")[i].parentElement.parentElement.id.replace("note",""))][1]*window.innerHeight*0.12))}px`
         }
     }
