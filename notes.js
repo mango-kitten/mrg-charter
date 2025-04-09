@@ -95,7 +95,6 @@ function changeScore(added) {
     //let noisevals = scoreNoise(Math.round(Math.random()*5)+2)
     gamedata.score = gamedata.score + Math.floor(added)
     document.getElementById("totalscoretrack").innerHTML = `Score: ${gamedata.score}`
-    console.log(added)
 }
 function resetScore() {
     gamedata.score = 0
@@ -117,7 +116,7 @@ for (let i=1; i<=4; i++) {
     object.classList = `laneobject lanebeat lane${i}`
     object = document.body.appendChild(document.getElementById("objectstorer").getElementsByClassName("indicobject")[0].cloneNode())
     object.id = `indic${i}`
-    object.innerHTML = `<br><br>${savedata.userkeys[i-1]}`
+    object.innerHTML = `${savedata.userkeys[i-1]}`
 }
 function setUpSeconds() {
     document.getElementById("secondholder").innerHTML = ""

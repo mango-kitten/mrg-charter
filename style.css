@@ -161,6 +161,7 @@ body {
 .indicobject {
     width: 26px;
     height: 12vh;
+    line-height: 12vh;
     background-color: rgb(192, 72, 192);
     border: 1px solid #abcdef;
     text-align: center;
@@ -385,11 +386,24 @@ body {
     word-break: break-all;
     height: 25vh;
     width: 50vw;
-    left: 25vw;
+    left: 2vw;
     bottom: 1vh;
 }
 .songdataobject {
     position: absolute;
     top: -1000px;
     left: -1000px;
+}
+#notetimingindic {
+    position: absolute;
+    width: 300px;
+    height: 100px;
+    bottom: 30px;
+    right: 50px;
+    /* background-color: rgb(59, 59, 59); */
+}
+#notetimingindicimg {
+    height: 100%;
+    width: 100%;
+    
 }

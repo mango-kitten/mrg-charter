@@ -14,7 +14,7 @@ let songdata = {
 let pixelspersecond = 300
 let noteforgiveness = 0.4
 let startdelay = 0
-let enginever = "0.1.0"
+let enginever = "0.1.1"
 
 let combomulti = 1
 
@@ -51,6 +51,10 @@ function seekSong(seconds) {
     for (let i=0;i<prehitbeats.length;i++) {
         prehitbeats[i].classList = "beatdropobject beatdropobjectfin"
     }
+    let prehitholds = document.getElementsByClassName("notelongheld")
+    for (let i=0;i<prehitholds.length;i++) {
+        prehitholds[i].classList = "notelongobject"
+    }
     resetScore()
     resetCombo()
 }
@@ -68,6 +72,10 @@ function trackSong(seconds) {
     let prehitbeats = document.getElementsByClassName("beatdropreached")
     for (let i=0;i<prehitbeats.length;i++) {
         prehitbeats[i].classList = "beatdropobject beatdropobjectfin"
+    }
+    let prehitholds = document.getElementsByClassName("notelongheld")
+    for (let i=0;i<prehitholds.length;i++) {
+        prehitholds[i].classList = "notelongobject"
     }
     resetScore()
     resetCombo()
@@ -339,6 +347,7 @@ setInterval( function () {
                 } else {
                     if (nodes[i].classList == "noteobject noteobjectactive") {
                         resetCombo()
+                        missText()
                     }
                     nodes[i].classList = `noteobject`
                 }
@@ -416,9 +425,9 @@ function touches(a, b) {
 
 let allholdintervals = [false, false, false, false]
 function startHoldNote(keyindex, noteheld) {
+    // console.log(document.getElementById(`notehold${noteheld}`), noteheld)
     document.getElementById(`notehold${noteheld}`).classList = "notelongobject notelongheld"
     allholdintervals[keyindex] = setInterval( function () {
-        // console.log(songdata.songs[songplaying][1][noteheld][2] + songdata.songs[songplaying][1][noteheld][1], (Number(document.getElementById("musicplayer").currentTime)*pixelspersecond))
         if (inholdnotes[keyindex] == true && songdata.songs[songplaying][1][noteheld][2] + songdata.songs[songplaying][1][noteheld][0] > (Number(document.getElementById("musicplayer").currentTime)*pixelspersecond)) {
             if (touches(document.getElementById(`indic${keyindex+1}`), document.getElementById(`notehold${noteheld}`))) {
                 changeScore(143*combomulti)
@@ -430,18 +439,55 @@ function startHoldNote(keyindex, noteheld) {
                 }, 200)
             }
         }
-    }, 250)
+    }, 500)
 }
 function stopHoldNote(keyindex) {
     clearInterval(allholdintervals[keyindex])
 
 }
 
+let resettimingtmo
+let resettimingtmowait = 2000
+function flawlessText() {
+    clearTimeout(resettimingtmo)
+    document.getElementById("notetimingindicimg").src = "img/mrg_sprite_flawless.png"
+    resettimingtmo = setTimeout( function () {
+        document.getElementById("notetimingindicimg").src = "img/mrg_sprite_blank.png"
+    }, resettimingtmowait)
+}
+function perfectText() {
+    clearTimeout(resettimingtmo)
+    document.getElementById("notetimingindicimg").src = "img/mrg_sprite_perfect.png"
+    resettimingtmo = setTimeout( function () {
+        document.getElementById("notetimingindicimg").src = "img/mrg_sprite_blank.png"
+    }, resettimingtmowait)
+}
+function greatText() {
+    clearTimeout(resettimingtmo)
+    document.getElementById("notetimingindicimg").src = "img/mrg_sprite_great.png"
+    resettimingtmo = setTimeout( function () {
+        document.getElementById("notetimingindicimg").src = "img/mrg_sprite_blank.png"
+    }, resettimingtmowait)
+}
+function okayText() {
+    clearTimeout(resettimingtmo)
+    document.getElementById("notetimingindicimg").src = "img/mrg_sprite_okay.png"
+    resettimingtmo = setTimeout( function () {
+        document.getElementById("notetimingindicimg").src = "img/mrg_sprite_blank.png"
+    }, resettimingtmowait)
+}
+function missText() {
+    clearTimeout(resettimingtmo)
+    document.getElementById("notetimingindicimg").src = "img/mrg_sprite_miss.png"
+    resettimingtmo = setTimeout( function () {
+        document.getElementById("notetimingindicimg").src = "img/mrg_sprite_blank.png"
+    }, resettimingtmowait)
+}
+
 let inholdnotes = [false, false, false, false]
 function keyFired(keyindex) {
     document.getElementById(`indic${keyindex}`).classList = `indicobject indicactive`
     if (inholdnotes[keyindex-1] == true) {
-        // console.log(`key ${keyindex} is in a hold note!`)
     } else {
         // let noteattempt = 0
         let notefound = undefined
@@ -465,12 +511,23 @@ function keyFired(keyindex) {
                 startHoldNote(keyindex-1, Number(notefound.id.replace("note","")))
             } else {
             }
-            changeScore(((((pixelspersecond*noteforgiveness)- Math.abs(Number(notefound.style.left.replace("px",""))-93))*(1/(pixelspersecond*(noteforgiveness/830)))) + 600)*combomulti) // where the magic happens (future me doesnt know how the fuck this part works)
+            let nearpointsgained = (((pixelspersecond*noteforgiveness)- Math.abs(Number(notefound.style.left.replace("px",""))-93))*(1/(pixelspersecond*(noteforgiveness/830)))) // where the magic happens (future me doesnt know how the fuck this part works)
+            if (nearpointsgained > 730) { // max points for nearpointsgained = 830 = 1430 (max base points) - 600
+                flawlessText()
+            } else if (nearpointsgained > 600) {
+                perfectText()
+            } else if (nearpointsgained > 400) {
+                greatText()
+            } else {
+                okayText()
+            }
+            changeScore((nearpointsgained + 600)*combomulti)
             increaseCombo()
             notefound.classList = "noteobject noteobjecthit"
         } else {
             console.log("There are no available notes in this lane!")
             resetCombo()
+            missText()
         }
     }
 }
@@ -530,11 +587,35 @@ function startLongSetup() {
 }
 function longSetup(selectedobject, setholdlen) {
     // noteclickmoveoverride = 3
+
+    // let newhold = selectedobject.appendChild(document.getElementById("ghostnoteobject").cloneNode(true))
+    // newhold.removeAttribute('id')
+    // newhold.classList = "notelongholder"
+    // newhold.style.position = "fixed"
+    // newhold.style.top = selectedobject.style.top
+    // newhold.style.left = `${Number(selectedobject.style.left.replace("px",""))}px`
+    // let newmid = newhold.getElementsByClassName("notelongghostobject")[0]
+    // newmid.classList = "notelongobject"
+    // // newmid.style.position = "fixed"
+    // // newmid.style.top = `${Number(selectedobject.style.top.replace("px","")) + (0.03*window.innerHeight)}px`
+    // newmid.style.top = `${0.03*window.innerHeight}px`
+    // // newmid.style.left = `${Number(selectedobject.style.left.replace("px",""))+(0.01*window.innerWidth)}px`
+    // newmid.style.left = `${0.01*window.innerWidth}px`
+    // newmid.style.width = `${setholdlen}px`
+    // let newend = newhold.getElementsByClassName("polylineghostobject")[0]
+    // newend.style.position = "absolute"
+    // newend.style.left = `${Number(selectedobject.style.left.replace("px",""))+setholdlen}px`
+    // newend.style.top = selectedobject.style.top
+
+
     let newhold = selectedobject.appendChild(document.getElementById("objectstorer").getElementsByClassName("notelongobject")[0].cloneNode())
-    newhold.id = `notehold${contextmenuonid.replace("note","")}`
+    newhold.id = `notehold${selectedobject.id.replace("note","")}`
     newhold.style.width = `${setholdlen}px`
+    // newhold.style.left = selectedobject.style.left
+    // newhold.style.top = `${Number(selectedobject.style.top.replace("px",""))+(0.03*window.innerHeight)}px`
     let newend = selectedobject.appendChild(document.getElementById("objectstorer").getElementsByClassName("polylineobject")[0].cloneNode(true))
     newend.style.left = `${setholdlen}px`
+
     songdata.songs[songplaying][1][Number(contextmenuonid.replace("note",""))][2] = setholdlen
     let ghostobj = document.getElementById("ghostnoteobject")
     ghostobj.style.top = "-1500px"
@@ -731,6 +812,18 @@ function fullImport() {
         console.log("Canceled action")
     }
 }
+let lastsongplaying = 0
+setInterval( function () {
+    if (lastsongplaying != songplaying) {
+        lastsongplaying = songplaying
+        setTimeout( function () {
+            clearNotes()
+        }, 100)
+        setTimeout( function () {
+            buildNotes()
+        }, 200)
+    }
+}, 1000)
 function buildNotes() {
     for (let i=0;i<songdata.songs[songplaying][1].length;i++) {
         let noteslen = document.getElementById("noteholder").children.length
@@ -785,8 +878,15 @@ function resizeNotes() {
     for (let i=0;i<document.getElementsByClassName("notepolygon").length;i++) {
         document.getElementsByClassName("notepolygon")[i].setAttribute("points",`0,${0.06*window.innerHeight} ${0.015*window.innerHeight},0 ${0.03*window.innerHeight},${0.06*window.innerHeight} ${0.015*window.innerHeight},${0.12*window.innerHeight} 0,${0.06*window.innerHeight}`)
         if (i>1) {
-            document.getElementsByClassName("notepolygon")[i].parentElement.parentElement.style.top = `${((0.08*window.innerHeight)+(songdata.songs[songplaying][1][Number(document.getElementsByClassName("notepolygon")[i].parentElement.parentElement.id.replace("note",""))][1]*window.innerHeight*0.12))}px`
+            try {
+                document.getElementsByClassName("notepolygon")[i].parentElement.parentElement.style.top = `${((0.08*window.innerHeight)+(songdata.songs[songplaying][1][Number(document.getElementsByClassName("notepolygon")[i].parentElement.parentElement.id.replace("note",""))][1]*window.innerHeight*0.12))}px`
+            } catch (err) { }
         }
+        try {
+            if (songdata.songs[songplaying][1][i][2] && songdata.songs[songplaying][1][i][2] != 0) {
+                document.getElementById(`notehold${i}`)
+            }
+        } catch (err) { }
     }
 }
 window.onresize = resizeNotes;

@@ -7,7 +7,7 @@ savedata = {
     },
     totalscore: 0,
     rating: 0,
-    userkeys: ["2","w","s","x"]
+    userkeys: ["2","w","k","m"] // i dont actually know what keys to use...
 }
 
 function encrypt(string) {
