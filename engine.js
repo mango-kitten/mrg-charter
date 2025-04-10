@@ -448,37 +448,10 @@ function stopHoldNote(keyindex) {
 
 let resettimingtmo
 let resettimingtmowait = 2000
-function flawlessText() {
+
+function displayStyleText(source = "img/mrg_sprite_flawless.png") {
     clearTimeout(resettimingtmo)
-    document.getElementById("notetimingindicimg").src = "img/mrg_sprite_flawless.png"
-    resettimingtmo = setTimeout( function () {
-        document.getElementById("notetimingindicimg").src = "img/mrg_sprite_blank.png"
-    }, resettimingtmowait)
-}
-function perfectText() {
-    clearTimeout(resettimingtmo)
-    document.getElementById("notetimingindicimg").src = "img/mrg_sprite_perfect.png"
-    resettimingtmo = setTimeout( function () {
-        document.getElementById("notetimingindicimg").src = "img/mrg_sprite_blank.png"
-    }, resettimingtmowait)
-}
-function greatText() {
-    clearTimeout(resettimingtmo)
-    document.getElementById("notetimingindicimg").src = "img/mrg_sprite_great.png"
-    resettimingtmo = setTimeout( function () {
-        document.getElementById("notetimingindicimg").src = "img/mrg_sprite_blank.png"
-    }, resettimingtmowait)
-}
-function okayText() {
-    clearTimeout(resettimingtmo)
-    document.getElementById("notetimingindicimg").src = "img/mrg_sprite_okay.png"
-    resettimingtmo = setTimeout( function () {
-        document.getElementById("notetimingindicimg").src = "img/mrg_sprite_blank.png"
-    }, resettimingtmowait)
-}
-function missText() {
-    clearTimeout(resettimingtmo)
-    document.getElementById("notetimingindicimg").src = "img/mrg_sprite_miss.png"
+    document.getElementById("notetimingindicimg").src = arguments[0]
     resettimingtmo = setTimeout( function () {
         document.getElementById("notetimingindicimg").src = "img/mrg_sprite_blank.png"
     }, resettimingtmowait)
@@ -513,13 +486,13 @@ function keyFired(keyindex) {
             }
             let nearpointsgained = (((pixelspersecond*noteforgiveness)- Math.abs(Number(notefound.style.left.replace("px",""))-93))*(1/(pixelspersecond*(noteforgiveness/830)))) // where the magic happens (future me doesnt know how the fuck this part works)
             if (nearpointsgained > 730) { // max points for nearpointsgained = 830 = 1430 (max base points) - 600
-                flawlessText()
+                displayStyleText("img/mrg_sprite_flawless.png")
             } else if (nearpointsgained > 600) {
-                perfectText()
+                displayStyleText("img/mrg_sprite_perfect.png")
             } else if (nearpointsgained > 400) {
-                greatText()
+                displayStyleText("img/mrg_sprite_great.png")
             } else {
-                okayText()
+                displayStyleText("img/mrg_sprite_okay.png")
             }
             changeScore((nearpointsgained + 600)*combomulti)
             increaseCombo()
@@ -527,7 +500,7 @@ function keyFired(keyindex) {
         } else {
             console.log("There are no available notes in this lane!")
             resetCombo()
-            missText()
+            displayStyleText("img/mrg_sprite_miss.png")
         }
     }
 }
