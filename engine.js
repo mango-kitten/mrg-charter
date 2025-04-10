@@ -490,7 +490,7 @@ function keyFired(keyindex) {
     if (inholdnotes[keyindex-1] == true) {
     } else {
         // let noteattempt = 0
-        let notefound = undefined
+        let notefound = "None"
         let availnotes = document.getElementsByClassName("noteobjectactive")
         let closestpos = 10000000
         if (availnotes.length > 0) {
