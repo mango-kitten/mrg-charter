@@ -9,8 +9,7 @@
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Bungee+Spice&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Bungee+Outline&family=Bungee+Spice&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Bungee+Outline&family=Bungee+Spice&family=Special+Gothic+Expanded+One&display=swap" rel="stylesheet">
 
     </head>
     <body>
@@ -30,29 +29,29 @@
                 <polyline class="notepolygon" points="0,0"/>
             </svg>
         </div>
-        <div id="totalscoretrack">Score: <span id="greyscore">0000000</span></div>
-        <div id="totalcombotrack">Combo: 0 (x1)</div>
-        <input type="file" accept=".mp3" id="musicplayerinput">
-        <input type="file" accept=".txt" id="songplayerdatainput">
+        <div id="totalscoretrack">Score: <span id="greyscore">000000</span>0</div>
+        <div id="totalcombotrack">Combo: 0 (x1.00)</div>
+        <input type="file" accept=".mp3" id="musicplayerinput" onkeyup="event.preventDefault()">
+        <input type="file" accept=".txt" id="songplayerdatainput" onkeyup="event.preventDefault()">
         <audio id="musicplayer" src="" ontimeupdate="sldTimeUpdate()">
             <source src="" id="musicplayersrc">
             Your browser does not support this element 3:
         </audio>
         <div>
-            <button onclick="playSong()" class="musicplayerplay">Play</button>
-            <button onclick="pauseSong()" class="musicplayerpause">Pause</button>
-            <button onclick="seekSong(5)" class="musicplayerseek5">+5s</button>
-            <button onclick="seekSong(1)" class="musicplayerseek1">+1s</button>
-            <button onclick="trackSong(1)" class="musicplayertrack1">-1s</button>
-            <button onclick="trackSong(5)" class="musicplayertrack5">-5s</button>
-            <button onclick="fullExport()" class="musicplayerexport">Export</button>
-            <button onclick="undoLast()" class="musicplayerundo">Undo</button>
-            <button onclick="toggleGrid()" class="musicplayergrid"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-grid-3x3" viewBox="0 0 16 16">
+            <button onclick="playSong()" class="musicplayerplay" onkeyup="event.preventDefault()">Play</button>
+            <button onclick="pauseSong()" class="musicplayerpause" onkeyup="event.preventDefault()">Pause</button>
+            <button onclick="seekSong(5)" class="musicplayerseek5" onkeyup="event.preventDefault()">+5s</button>
+            <button onclick="seekSong(1)" class="musicplayerseek1" onkeyup="event.preventDefault()">+1s</button>
+            <button onclick="trackSong(1)" class="musicplayertrack1" onkeyup="event.preventDefault()">-1s</button>
+            <button onclick="trackSong(5)" class="musicplayertrack5" onkeyup="event.preventDefault()">-5s</button>
+            <button onclick="fullExport()" class="musicplayerexport" onkeyup="event.preventDefault()">Export</button>
+            <button onclick="undoLast()" class="musicplayerundo" onkeyup="event.preventDefault()">Undo</button>
+            <button onclick="toggleGrid()" class="musicplayergrid" onkeyup="event.preventDefault()"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="currentColor" class="bi bi-grid-3x3" viewBox="0 0 16 16">
                 <path d="M0 1.5A1.5 1.5 0 0 1 1.5 0h13A1.5 1.5 0 0 1 16 1.5v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 14.5zM1.5 1a.5.5 0 0 0-.5.5V5h4V1zM5 6H1v4h4zm1 4h4V6H6zm-1 1H1v3.5a.5.5 0 0 0 .5.5H5zm1 0v4h4v-4zm5 0v4h3.5a.5.5 0 0 0 .5-.5V11zm0-1h4V6h-4zm0-5h4V1.5a.5.5 0 0 0-.5-.5H11zm-1 0V1H6v4z"/>
               </svg> ON</button>
-            <button onclick="adjustGrid()" class="musicplayergridchange">1/8 sec</button>
-            <button onclick="fullImport()" class="musicplayerimport">Import</button>
-            <input type="range" min="0" max="100" value="0" step="1" class="currentTimeSlider" id="currentTimeSlider">
+            <button onclick="adjustGrid()" class="musicplayergridchange" onkeyup="event.preventDefault()">1/8 sec</button>
+            <button onclick="fullImport()" class="musicplayerimport" onkeyup="event.preventDefault()">Import</button>
+            <input type="range" min="0" max="100" value="0" step="1" class="currentTimeSlider" id="currentTimeSlider" onkeyup="event.preventDefault()">
             <div id="musicplayertime">0:00 / 0:00</div>
         </div>
         <div id="notetimingindic"><img id="notetimingindicimg" src="img/mrg_sprite_blank.png"></div>

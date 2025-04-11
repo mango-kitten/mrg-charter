@@ -80,6 +80,8 @@ function keyUp(evt) {
                 keyReleased(i+1)
             }
         }
+    } else if (evt.keyCode==32) {
+        spacePlay()
     }
 }
 
@@ -96,7 +98,6 @@ function changeScore(added) {
     gamedata.score = gamedata.score + Math.floor(added)
     let extrazeros = ""
     let extraadded = 7-String(gamedata.score).length
-    console.log(extraadded)
     for (let i=0;i<extraadded;i++) {
         extrazeros = `${extrazeros}0`
     }
@@ -106,7 +107,6 @@ function resetScore() {
     gamedata.score = 0
     let extrazeros = ""
     let extraadded = 7-String(gamedata.score).length
-    console.log(extraadded)
     for (let i=0;i<extraadded;i++) {
         extrazeros = `${extrazeros}0`
     }
@@ -115,7 +115,12 @@ function resetScore() {
 function increaseCombo() {
     gamedata.combo = gamedata.combo + 1
     combomulti = (1+(Math.sqrt(gamedata.combo)*0.02))
-    document.getElementById("totalcombotrack").innerHTML = `Combo: ${gamedata.combo} (x${Math.floor(combomulti*100)/100})`
+    let extrazeros = ""
+    let extraadded = 4-String(combomulti).length
+    for (let i=0;i<extraadded;i++) {
+        extrazeros = `${extrazeros}0`
+    }
+    document.getElementById("totalcombotrack").innerHTML = `Combo: ${gamedata.combo} (x${Math.floor(combomulti*100)/100}${extrazeros})`
 }
 function resetCombo() {
     gamedata.combo = 0

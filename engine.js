@@ -3,18 +3,22 @@
 let songdata = {
     songs: [
         [
-            0,
-            [],
-            "",
-            15,
-            []
+            0, // song len (ms)
+            [], // notes
+            "", // song file url
+            15, // UNUSED
+            [] // beat drops
         ]
     ]
 }
+
+// ==CONFIG==
 let pixelspersecond = 300
 let noteforgiveness = 0.4
 let startdelay = 0
-let enginever = "0.1.1"
+// ==END CONFIG==
+
+let enginever = "0.1.2"
 
 let combomulti = 1
 
@@ -43,17 +47,14 @@ function seekSong(seconds) {
     } else {
         musicplayer.currentTime = musicplayer.currentTime + seconds
     }
-    let prehitnotes = document.getElementsByClassName("noteobject")
-    for (let i=0;i<prehitnotes.length;i++) {
-        prehitnotes[i].classList = "noteobject"
+    for (let elementone of Array.from(document.getElementsByClassName("noteobject"))) { // converts to array to prevent dynamicly updating htmlcollection
+        elementone.classList = "noteobject"
     }
-    let prehitbeats = document.getElementsByClassName("beatdropreached")
-    for (let i=0;i<prehitbeats.length;i++) {
-        prehitbeats[i].classList = "beatdropobject beatdropobjectfin"
+    for (let elementtwo of Array.from(document.getElementsByClassName("beatdropreached"))) {
+        elementtwo.classList = "beatdropobject beatdropobjectfin"
     }
-    let prehitholds = document.getElementsByClassName("notelongheld")
-    for (let i=0;i<prehitholds.length;i++) {
-        prehitholds[i].classList = "notelongobject"
+    for (let elementthree of Array.from(document.getElementsByClassName("notelongheld"))) {
+        elementthree.classList = "notelongobject"
     }
     resetScore()
     resetCombo()
@@ -65,17 +66,14 @@ function trackSong(seconds) {
     } else {
         musicplayer.currentTime = musicplayer.currentTime - seconds
     }
-    let prehitnotes = document.getElementsByClassName("noteobject")
-    for (let i=0;i<prehitnotes.length;i++) {
-        prehitnotes[i].classList = "noteobject"
+    for (let elementone of Array.from(document.getElementsByClassName("noteobject"))) {
+        elementone.classList = "noteobject"
     }
-    let prehitbeats = document.getElementsByClassName("beatdropreached")
-    for (let i=0;i<prehitbeats.length;i++) {
-        prehitbeats[i].classList = "beatdropobject beatdropobjectfin"
+    for (let elementtwo of Array.from(document.getElementsByClassName("beatdropreached"))) {
+        elementtwo.classList = "beatdropobject beatdropobjectfin"
     }
-    let prehitholds = document.getElementsByClassName("notelongheld")
-    for (let i=0;i<prehitholds.length;i++) {
-        prehitholds[i].classList = "notelongobject"
+    for (let elementthree of Array.from(document.getElementsByClassName("notelongheld"))) {
+        elementthree.classList = "notelongobject"
     }
     resetScore()
     resetCombo()
@@ -177,7 +175,7 @@ function convertTime(seconds) {
 }
 function changeTimeSld() {
     document.getElementById("currentTimeSlider").min = 0
-    document.getElementById("currentTimeSlider").max = Math.round(Number(document.getElementById("musicplayer").duration)*10)
+    document.getElementById("currentTimeSlider").max = Math.ceil(Number(document.getElementById("musicplayer").duration)*10)
     document.getElementById("currentTimeSlider").value = 0
 }
 function changeTimeIndic() {
@@ -838,7 +836,7 @@ function beatDrop() { // finally works
         for (let i=0;i<lanes.length;i++) {
             lanes[i].classList = `laneobject lane${i} lanebeat`
         }
-    }, 1000)
+    }, 500)
 }
 
 function resizeNotes() {
@@ -853,3 +851,12 @@ function resizeNotes() {
 }
 window.onresize = resizeNotes;
 resizeNotes()
+
+
+function spacePlay() {
+    if (songisplaying == 0) {
+        playSong()
+    } else if (songisplaying == 1) {
+        pauseSong()
+    }
+}
