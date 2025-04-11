@@ -149,6 +149,13 @@ body {
     height: 48vh;
     /* border: 1px solid black; */
 }
+.beatdropobjecttop {
+    width: 25px;
+    height: 2vh;
+    background-color: rgb(255, 0, 0);
+    position: relative;
+    /* top: -48vh; */
+}
 .timeobjectfin {
     position: absolute;
 }

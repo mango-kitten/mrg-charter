@@ -347,7 +347,7 @@ setInterval( function () {
                 } else {
                     if (nodes[i].classList == "noteobject noteobjectactive") {
                         resetCombo()
-                        missText()
+                        displayStyleText("img/mrg_sprite_miss.png")
                     }
                     nodes[i].classList = `noteobject`
                 }
@@ -448,6 +448,14 @@ function stopHoldNote(keyindex) {
 
 let resettimingtmo
 let resettimingtmowait = 2000
+function displayStyleText(source) {
+    clearTimeout(resettimingtmo)
+    document.getElementById("notetimingindicimg").src = source
+    resettimingtmo = setTimeout( function () {
+        document.getElementById("notetimingindicimg").src = "img/mrg_sprite_blank.png"
+    }, resettimingtmowait)
+}
+
 function flawlessText() {
     clearTimeout(resettimingtmo)
     document.getElementById("notetimingindicimg").src = "img/mrg_sprite_flawless.png"
@@ -513,21 +521,21 @@ function keyFired(keyindex) {
             }
             let nearpointsgained = (((pixelspersecond*noteforgiveness)- Math.abs(Number(notefound.style.left.replace("px",""))-93))*(1/(pixelspersecond*(noteforgiveness/830)))) // where the magic happens (future me doesnt know how the fuck this part works)
             if (nearpointsgained > 730) { // max points for nearpointsgained = 830 = 1430 (max base points) - 600
-                flawlessText()
+                displayStyleText("img/mrg_sprite_flawless.png")
             } else if (nearpointsgained > 600) {
-                perfectText()
+                displayStyleText("img/mrg_sprite_perfect.png")
             } else if (nearpointsgained > 400) {
-                greatText()
+                displayStyleText("img/mrg_sprite_great.png")
             } else {
-                okayText()
+                displayStyleText("img/mrg_sprite_okay.png")
             }
             changeScore((nearpointsgained + 600)*combomulti)
             increaseCombo()
             notefound.classList = "noteobject noteobjecthit"
         } else {
-            console.log("There are no available notes in this lane!")
+            // console.log("There are no available notes in this lane!")
             resetCombo()
-            missText()
+            displayStyleText("img/mrg_sprite_miss.png")
         }
     }
 }
@@ -538,7 +546,11 @@ function keyReleased(keyindex) {
 }
 
 
-let contextmenuvals = [`<div class="contextitem context1" onclick="moveNote()">&#8596;</div><div class="contextitem context2" onclick="changeLane()">&#8597;</div><div class="contextitem context3" onclick="deleteNote()">--</div><div class="contextitem context4" onclick="changeLong()">&#9830;</div>`, `<div class="contextitem context1" onclick="insertBeatDrop()">&odot;</div>`]
+let contextmenuvals = [
+    `<div class="contextitem context1" onclick="moveNote()">&#8596;</div><div class="contextitem context2" onclick="changeLane()">&#8597;</div><div class="contextitem context3" onclick="deleteNote()">--</div><div class="contextitem context4" onclick="changeLong()">&#9830;</div>`, 
+    `<div class="contextitem context1" onclick="insertBeatDrop()">&odot;</div>`, 
+    `<div class="contextitem context1" onclick="deleteBeatDrop()">--</div>`
+]
 
 const contextmenuelement = document.createElement("div")
 contextmenuelement.id = "rightclickmenu"
@@ -657,7 +669,7 @@ function insertBeatDrop() {
     } else {
         leftofnote = (mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)) + ((Number(document.getElementById("musicplayer").currentTime)+startdelay)*pixelspersecond)
     }
-    let object = document.getElementById("secondholder").appendChild(document.getElementById("objectstorer").getElementsByClassName("beatdropobject")[0].cloneNode())
+    let object = document.getElementById("secondholder").appendChild(document.getElementById("objectstorer").getElementsByClassName("beatdropobject")[0].cloneNode(true))
     object.style.left = `${leftofnote - ((Number(document.getElementById("musicplayer").currentTime)+startdelay)*pixelspersecond)}px`
     object.style.top = `20vh`
     object.classList = "beatdropobject beatdropobjectfin"
@@ -666,6 +678,22 @@ function insertBeatDrop() {
     contextmenuelement.style.left = `-1000px`
     contextmenuelement.style.top = `-1000px`
     pushAction(4, [-1, -1], [leftofnote, 20*window.innerHeight], `beat${existbeatobjects.length-1}`)
+}
+function cutBeat(beatvals, array) {
+    let returnedarray = []
+    for (let i=0;i<array.length;i++) {
+        if (JSON.stringify(array[i]) == JSON.stringify(beatvals[0])) {
+        } else {
+            returnedarray.push(array[i])
+        }
+    }
+    return returnedarray
+}
+function deleteBeatDrop() {
+    document.getElementById(contextmenuonid).remove()
+    songdata.songs[songplaying][4] = cutBeat(contextmenuonvals, songdata.songs[songplaying][4])
+    contextmenuelement.style.left = `-1000px`
+    contextmenuelement.style.top = `-1000px`
 }
 
 let contextmenuonvals = []
@@ -683,6 +711,12 @@ if (document.addEventListener) {
                 contextmenuonvals = [songdata.songs[songplaying][1][Number(e.target.parentElement.parentElement.id.replace("note",""))][0], songdata.songs[songplaying][1][Number(e.target.parentElement.parentElement.id.replace("note",""))][1]]
                 contextmenuelement.style.left = `${e.target.parentElement.parentElement.style.left}`
                 contextmenuelement.style.top = `${e.target.parentElement.parentElement.style.top}`
+            } else if (e.target.classList.value.includes("beatdropobjecttop")) {
+                contextmenuonid = e.target.parentElement.id
+                contextmenuelement.innerHTML = contextmenuvals[2]
+                contextmenuonvals = [songdata.songs[songplaying][4][Number(e.target.parentElement.id.replace("beat",""))][0], 0]
+                contextmenuelement.style.left = `${e.target.parentElement.style.left}`
+                contextmenuelement.style.top = `${e.target.parentElement.style.top}`
             } else if (e.target.classList.value.includes("lane")) {
                 contextmenuonpos = [roundDownNearest(indicOffset - nearestSecondOff, gridscale, mousepos[0]), mousepos[1]]
                 contextmenuelement.innerHTML = contextmenuvals[1]
