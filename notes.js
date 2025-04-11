@@ -94,11 +94,23 @@ function keyUp(evt) {
 function changeScore(added) {
     //let noisevals = scoreNoise(Math.round(Math.random()*5)+2)
     gamedata.score = gamedata.score + Math.floor(added)
-    document.getElementById("totalscoretrack").innerHTML = `Score: ${gamedata.score}`
+    let extrazeros = ""
+    let extraadded = 7-String(gamedata.score).length
+    console.log(extraadded)
+    for (let i=0;i<extraadded;i++) {
+        extrazeros = `${extrazeros}0`
+    }
+    document.getElementById("totalscoretrack").innerHTML = `Score: <span id="greyscore">${extrazeros}</span>${gamedata.score}`
 }
 function resetScore() {
     gamedata.score = 0
-    document.getElementById("totalscoretrack").innerHTML = `Score: ${gamedata.score}`
+    let extrazeros = ""
+    let extraadded = 7-String(gamedata.score).length
+    console.log(extraadded)
+    for (let i=0;i<extraadded;i++) {
+        extrazeros = `${extrazeros}0`
+    }
+    document.getElementById("totalscoretrack").innerHTML = `Score: <span id="greyscore">${extrazeros}</span>${gamedata.score}`
 }
 function increaseCombo() {
     gamedata.combo = gamedata.combo + 1

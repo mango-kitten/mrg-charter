@@ -456,42 +456,6 @@ function displayStyleText(source) {
     }, resettimingtmowait)
 }
 
-function flawlessText() {
-    clearTimeout(resettimingtmo)
-    document.getElementById("notetimingindicimg").src = "img/mrg_sprite_flawless.png"
-    resettimingtmo = setTimeout( function () {
-        document.getElementById("notetimingindicimg").src = "img/mrg_sprite_blank.png"
-    }, resettimingtmowait)
-}
-function perfectText() {
-    clearTimeout(resettimingtmo)
-    document.getElementById("notetimingindicimg").src = "img/mrg_sprite_perfect.png"
-    resettimingtmo = setTimeout( function () {
-        document.getElementById("notetimingindicimg").src = "img/mrg_sprite_blank.png"
-    }, resettimingtmowait)
-}
-function greatText() {
-    clearTimeout(resettimingtmo)
-    document.getElementById("notetimingindicimg").src = "img/mrg_sprite_great.png"
-    resettimingtmo = setTimeout( function () {
-        document.getElementById("notetimingindicimg").src = "img/mrg_sprite_blank.png"
-    }, resettimingtmowait)
-}
-function okayText() {
-    clearTimeout(resettimingtmo)
-    document.getElementById("notetimingindicimg").src = "img/mrg_sprite_okay.png"
-    resettimingtmo = setTimeout( function () {
-        document.getElementById("notetimingindicimg").src = "img/mrg_sprite_blank.png"
-    }, resettimingtmowait)
-}
-function missText() {
-    clearTimeout(resettimingtmo)
-    document.getElementById("notetimingindicimg").src = "img/mrg_sprite_miss.png"
-    resettimingtmo = setTimeout( function () {
-        document.getElementById("notetimingindicimg").src = "img/mrg_sprite_blank.png"
-    }, resettimingtmowait)
-}
-
 let inholdnotes = [false, false, false, false]
 function keyFired(keyindex) {
     document.getElementById(`indic${keyindex}`).classList = `indicobject indicactive`
@@ -598,28 +562,6 @@ function startLongSetup() {
     noteclickmoveoverride = 3
 }
 function longSetup(selectedobject, setholdlen) {
-    // noteclickmoveoverride = 3
-
-    // let newhold = selectedobject.appendChild(document.getElementById("ghostnoteobject").cloneNode(true))
-    // newhold.removeAttribute('id')
-    // newhold.classList = "notelongholder"
-    // newhold.style.position = "fixed"
-    // newhold.style.top = selectedobject.style.top
-    // newhold.style.left = `${Number(selectedobject.style.left.replace("px",""))}px`
-    // let newmid = newhold.getElementsByClassName("notelongghostobject")[0]
-    // newmid.classList = "notelongobject"
-    // // newmid.style.position = "fixed"
-    // // newmid.style.top = `${Number(selectedobject.style.top.replace("px","")) + (0.03*window.innerHeight)}px`
-    // newmid.style.top = `${0.03*window.innerHeight}px`
-    // // newmid.style.left = `${Number(selectedobject.style.left.replace("px",""))+(0.01*window.innerWidth)}px`
-    // newmid.style.left = `${0.01*window.innerWidth}px`
-    // newmid.style.width = `${setholdlen}px`
-    // let newend = newhold.getElementsByClassName("polylineghostobject")[0]
-    // newend.style.position = "absolute"
-    // newend.style.left = `${Number(selectedobject.style.left.replace("px",""))+setholdlen}px`
-    // newend.style.top = selectedobject.style.top
-
-
     let newhold = selectedobject.appendChild(document.getElementById("objectstorer").getElementsByClassName("notelongobject")[0].cloneNode())
     newhold.id = `notehold${selectedobject.id.replace("note","")}`
     newhold.style.width = `${setholdlen}px`
@@ -704,7 +646,7 @@ if (document.addEventListener) {
     document.addEventListener('contextmenu', function(e) {
         e.preventDefault();
         if (document.getElementById("musicplayerinput").files[0]) {
-            if (e.target.parentElement.parentElement.id.includes("note") && e.target.parentElement.parentElement.id != "noteholder") {
+            if (e.target.parentElement.parentElement.id.includes("note") && e.target.parentElement.parentElement.id != "noteholder" && e.target.parentElement.parentElement.id != "ghostnoteobject") {
                 contextmenuonid = e.target.parentElement.parentElement.id
                 contextmenuelement.innerHTML = contextmenuvals[0]
                 // I FOUND THE BUG <- this is staying in the code
@@ -734,15 +676,6 @@ if (document.addEventListener) {
     }, false);
 } else {
     alert("This version of browser is not supported with the context menu! Please update your browser to use this software.")
-    // document.attachEvent('oncontextmenu', function() { // might not work :(
-    //     window.event.returnValue = false;
-    //     if (window.event.target.parentElement.parentElement.id.includes("note")) {
-    //         contextmenuonid = window.event.target.parentElement.parentElement.id
-    //         contextmenuonvals = [Number(window.event.target.parentElement.parentElement.style.left.replace("px","")), songdata.songs[songplaying][1][Number(window.event.target.parentElement.parentElement.id.replace("note",""))][1]]
-    //         contextmenuelement.style.left = `${window.event.target.parentElement.parentElement.style.left}`
-    //         contextmenuelement.style.top = `${window.event.target.parentElement.parentElement.style.top}`
-    //     }
-    // });
 }
 
 const exportelement = document.createElement("div")
@@ -916,11 +849,6 @@ function resizeNotes() {
                 document.getElementsByClassName("notepolygon")[i].parentElement.parentElement.style.top = `${((0.08*window.innerHeight)+(songdata.songs[songplaying][1][Number(document.getElementsByClassName("notepolygon")[i].parentElement.parentElement.id.replace("note",""))][1]*window.innerHeight*0.12))}px`
             } catch (err) { }
         }
-        try {
-            if (songdata.songs[songplaying][1][i][2] && songdata.songs[songplaying][1][i][2] != 0) {
-                document.getElementById(`notehold${i}`)
-            }
-        } catch (err) { }
     }
 }
 window.onresize = resizeNotes;

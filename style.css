@@ -59,12 +59,17 @@ body {
     left: 0.25vw;
     font-size: 4vh;
     position: absolute;
+    font-family: "Bungee Spice", sans-serif;
 }
 #totalcombotrack {
     top: 0.25vh;
     left: 20vw;
     font-size: 4vh;
     position: absolute;
+    font-family: "Bungee Spice", sans-serif;
+}
+#greyscore {
+    font-family: "Bungee Outline", sans-serif;
 }
 #musicplayerinput {
     top: 14vh;
@@ -91,8 +96,8 @@ body {
 .notelongobject {
     height: 6vh;
     background-color: var(--noteholdcolor);
-    position: relative;
-    top: -18vh;
+    position: absolute;
+    top: 3vh;
     left: 1vh;
     z-index: -1;
 }
@@ -118,8 +123,8 @@ body {
     fill: var(--notecolor);
 }
 .polylineobject {
-    position: relative;
-    top: -27vh;
+    position: absolute;
+    top: 0;
 }
 .holdnoteboost {
     animation: hold-stretch 0.15s forwards;

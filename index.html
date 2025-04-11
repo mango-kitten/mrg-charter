@@ -6,6 +6,12 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js" integrity="sha256-/H4YS+7aYb9kJ5OKhFYPUjSJdrtV6AeyJOtTkw6X72o=" crossorigin="anonymous"></script>
         <script src="save.js"></script>
         <script src="songs/MRG_Song_twilight_test_v0.0.0.txt"></script>
+
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Bungee+Spice&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Bungee+Outline&family=Bungee+Spice&display=swap" rel="stylesheet">
+
     </head>
     <body>
         <div id="objectstorer">
@@ -24,7 +30,7 @@
                 <polyline class="notepolygon" points="0,0"/>
             </svg>
         </div>
-        <div id="totalscoretrack">Score: 0</div>
+        <div id="totalscoretrack">Score: <span id="greyscore">0000000</span></div>
         <div id="totalcombotrack">Combo: 0 (x1)</div>
         <input type="file" accept=".mp3" id="musicplayerinput">
         <input type="file" accept=".txt" id="songplayerdatainput">
