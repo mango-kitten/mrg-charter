@@ -230,85 +230,103 @@ function cutNote(notevals, array) {
 let noteclickmoveoverride = 0
 document.addEventListener('mousedown', function (event) {
     if (event.button == 0 && document.getElementById("musicplayerinput").files[0]) {
-        if (noteclickmoveoverride == 0) {
-            if (event.target.parentElement) {
-                if (event.target.parentElement.id != "rightclickmenu") {
-                    let lanein = 0
-                    let lanestarts = [window.innerHeight*0.2,window.innerHeight*0.32,window.innerHeight*0.44,window.innerHeight*0.56]
-                    let laneends = [window.innerHeight*0.32,window.innerHeight*0.44,window.innerHeight*0.56,window.innerHeight*0.68]
-                    for (let i=0;i<lanestarts.length;i++) {
-                        if (mousepos[1]>=lanestarts[i] && mousepos[1]<laneends[i]) {
-                            lanein = i+1
-                        }
-                    }
-                    contextmenuelement.style.left = `-1000px`
-                    contextmenuelement.style.top = `-1000px`
-                    let topofnote = ((0.08*window.innerHeight)+(lanein*window.innerHeight*0.12))
-                    let leftofnote
-                    if (gridon == 1) {
-                        leftofnote = roundDownNearest(indicOffset - nearestSecondOff, gridscale, mousepos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
-                    } else {
-                        leftofnote = mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
-                    }
-                    if (event.target.id.includes("note")) { // comment out this line through the next 'else' to make note placement more free - only mango will understand this
-                        console.log("note object already exists there")
-                    } else if (JSON.stringify(songdata.songs[songplaying][1]).includes(JSON.stringify([leftofnote,lanein]))) {
-                        console.log("note object already exists there")
-                    } else {
-                        if (lanein != 0) {
+        if (songisplaying == 0) {
+            if (noteclickmoveoverride == 0) {
+                if (event.target.parentElement) {
+                    if (event.target.parentElement.id != "rightclickmenu") {
+                        if (ghostnoteat[0] < 0 || ghostnoteat[1] < 0) {
+                            let lanein = 0
+                            let lanestarts = [window.innerHeight*0.2,window.innerHeight*0.32,window.innerHeight*0.44,window.innerHeight*0.56]
+                            let laneends = [window.innerHeight*0.32,window.innerHeight*0.44,window.innerHeight*0.56,window.innerHeight*0.68]
+                            for (let i=0;i<lanestarts.length;i++) {
+                                if (mousepos[1]>=lanestarts[i] && mousepos[1]<laneends[i]) {
+                                    lanein = i+1
+                                }
+                            }
+                            contextmenuelement.style.left = `-1000px`
+                            contextmenuelement.style.top = `-1000px`
+                            let topofnote = ((0.08*window.innerHeight)+(lanein*window.innerHeight*0.12))
+                            let leftofnote
+                            if (gridon == 1) {
+                                leftofnote = roundDownNearest(indicOffset - nearestSecondOff, gridscale, mousepos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+                            } else {
+                                leftofnote = mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+                            }
+                            if (event.target.id.includes("note")) { // comment out this line through the next 'else' to make note placement more free - only mango will understand this
+                                console.log("note object already exists there")
+                            } else if (JSON.stringify(songdata.songs[songplaying][1]).includes(JSON.stringify([leftofnote,lanein]))) {
+                                console.log("note object already exists there")
+                            } else {
+                                if (lanein != 0) {
+                                    let noteslen = document.getElementById("noteholder").children.length
+                                    const noteobj = document.getElementById(`noteholder`).appendChild(document.getElementsByClassName("noteobject")[0].cloneNode(true))
+                                    noteobj.style.top = `${topofnote}px`
+                                    noteobj.style.left = `${leftofnote}px`
+                                    noteobj.id = `note${noteslen}`
+                                    notepx = Number(noteobj.style.left.replace("px","")) + ((Number(document.getElementById("musicplayer").currentTime)+startdelay)*pixelspersecond)
+                                    songdata.songs[songplaying][1].push([notepx, lanein])
+                                    pushAction(0, [-1, -1], [leftofnote, lanein], noteobj.id)
+                                }
+                            }
+                        } else {
+                            console.log(ghostnoteat)
+                            leftofnote = ghostnoteat[0]
+                            topofnote = ((0.08*window.innerHeight)+(ghostnoteat[1]*window.innerHeight*0.12)) // i should do a touches() for ghost note to set ghostnoteat = [-1, -1] if touching existing note
                             let noteslen = document.getElementById("noteholder").children.length
                             const noteobj = document.getElementById(`noteholder`).appendChild(document.getElementsByClassName("noteobject")[0].cloneNode(true))
                             noteobj.style.top = `${topofnote}px`
                             noteobj.style.left = `${leftofnote}px`
                             noteobj.id = `note${noteslen}`
                             notepx = Number(noteobj.style.left.replace("px","")) + ((Number(document.getElementById("musicplayer").currentTime)+startdelay)*pixelspersecond)
-                            songdata.songs[songplaying][1].push([notepx, lanein])
-                            pushAction(0, [-1, -1], [leftofnote, lanein], noteobj.id)
+                            songdata.songs[songplaying][1].push([notepx, ghostnoteat[1]])
+                            pushAction(0, [-1, -1], [leftofnote, ghostnoteat[1]], noteobj.id)
                         }
                     }
                 }
-            }
-        } else if (noteclickmoveoverride == 1) {
-            let newleftnote
-            if (gridon == 1) {
-                newleftnote = roundDownNearest(indicOffset, gridscale, mousepos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
-            } else {
-                newleftnote = mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
-            }
-            const noteused = document.getElementById(contextmenuonid)
-            let oldleftnote = songdata.songs[songplaying][1][Number(noteused.id.replace("note",""))][0]
-            noteused.style.left = `${newleftnote}px`
-            songdata.songs[songplaying][1][Number(contextmenuonid.replace("note",""))][0] = newleftnote + ((Number(document.getElementById("musicplayer").currentTime)+startdelay)*pixelspersecond)
-            noteused.classList = "noteobject"
-            noteclickmoveoverride = 0
-            pushAction(1, oldleftnote, newleftnote, contextmenuonid)
-        } else if (noteclickmoveoverride == 2) {
-            let newtopnote
-            let lanein = 0
-            let lanestarts = [window.innerHeight*0.2,window.innerHeight*0.32,window.innerHeight*0.44,window.innerHeight*0.56] // dumb of ass past me decided to do it in vh and vw...
-            let laneends = [window.innerHeight*0.32,window.innerHeight*0.44,window.innerHeight*0.56,window.innerHeight*0.68]
-            for (let i=0;i<lanestarts.length;i++) {
-                if (mousepos[1]>=lanestarts[i] && mousepos[1]<laneends[i]) {
-                    lanein = i+1
+            } else if (noteclickmoveoverride == 1) {
+                let newleftnote
+                if (gridon == 1) {
+                    newleftnote = roundDownNearest(indicOffset, gridscale, mousepos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+                } else {
+                    newleftnote = mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
                 }
+                const noteused = document.getElementById(contextmenuonid)
+                let oldleftnote = songdata.songs[songplaying][1][Number(noteused.id.replace("note",""))][0]
+                noteused.style.left = `${newleftnote}px`
+                songdata.songs[songplaying][1][Number(contextmenuonid.replace("note",""))][0] = newleftnote + ((Number(document.getElementById("musicplayer").currentTime)+startdelay)*pixelspersecond)
+                noteused.classList = "noteobject"
+                noteclickmoveoverride = 0
+                pushAction(1, oldleftnote, newleftnote, contextmenuonid)
+            } else if (noteclickmoveoverride == 2) {
+                let newtopnote
+                let lanein = 0
+                let lanestarts = [window.innerHeight*0.2,window.innerHeight*0.32,window.innerHeight*0.44,window.innerHeight*0.56] // dumb of ass past me decided to do it in vh and vw...
+                let laneends = [window.innerHeight*0.32,window.innerHeight*0.44,window.innerHeight*0.56,window.innerHeight*0.68]
+                for (let i=0;i<lanestarts.length;i++) {
+                    if (mousepos[1]>=lanestarts[i] && mousepos[1]<laneends[i]) {
+                        lanein = i+1
+                    }
+                }
+                newtopnote = ((0.08*window.innerHeight)+(lanein*window.innerHeight*0.12))
+                const noteused = document.getElementById(contextmenuonid)
+                let oldlanein = songdata.songs[songplaying][1][Number(noteused.id.replace("note",""))][1]
+                noteused.style.top = `${newtopnote}px`
+                songdata.songs[songplaying][1][Number(contextmenuonid.replace("note", ""))][1] = lanein
+                noteused.classList = "noteobject"
+                noteclickmoveoverride = 0
+                pushAction(2, oldlanein, lanein, contextmenuonid)
+            } else if (noteclickmoveoverride == 3) {
+                let newleftnote
+                if (gridon == 1) {
+                    newleftnote = roundDownNearest(indicOffset, gridscale, mousepos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+                } else {
+                    newleftnote = mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+                }
+                longSetup(longusing, (newleftnote-Number(longusing.style.left.replace("px",""))))
+                noteclickmoveoverride = 0
             }
-            newtopnote = ((0.08*window.innerHeight)+(lanein*window.innerHeight*0.12))
-            const noteused = document.getElementById(contextmenuonid)
-            let oldlanein = songdata.songs[songplaying][1][Number(noteused.id.replace("note",""))][1]
-            noteused.style.top = `${newtopnote}px`
-            songdata.songs[songplaying][1][Number(contextmenuonid.replace("note", ""))][1] = lanein
-            noteused.classList = "noteobject"
-            noteclickmoveoverride = 0
-            pushAction(2, oldlanein, lanein, contextmenuonid)
-        } else if (noteclickmoveoverride == 3) {
-            let newleftnote
-            if (gridon == 1) {
-                newleftnote = roundDownNearest(indicOffset, gridscale, mousepos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
-            } else {
-                newleftnote = mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
-            }
-            longSetup(longusing, (newleftnote-Number(longusing.style.left.replace("px",""))))
-            noteclickmoveoverride = 0
+        } else {
+            console.log("please pause the song before placing notes!")
         }
     } else {
         if (document.getElementById("musicplayerinput").files[0]) {
@@ -329,6 +347,7 @@ function ghostNoteTo(left, top) {
     ghostobj.style.top = `${top+(window.innerHeight*0.06)}px`
 }
 
+let ghostnoteat = [-1, -1]
 setInterval( function () {
     nearestSecondOff = (Number(document.getElementById("musicplayer").currentTime)-Math.floor(Number(document.getElementById("musicplayer").currentTime)))*pixelspersecond
     let nodes = document.getElementById("noteholder").children
@@ -373,37 +392,44 @@ setInterval( function () {
             }
         }
     }
-    if (noteclickmoveoverride == 3) {
-        let newleftnote
-        if (gridon == 1) {
-            newleftnote = roundDownNearest(indicOffset, gridscale, mousepos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
-        } else {
-            newleftnote = mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
-        }
-        longGhostSetup(longusing, (newleftnote-Number(longusing.style.left.replace("px",""))))
-    } else {
-        if (document.getElementById("musicplayerinput").files[0]) {
-            let lanein = 0
-            let lanestarts = [window.innerHeight*0.2,window.innerHeight*0.32,window.innerHeight*0.44,window.innerHeight*0.56]
-            let laneends = [window.innerHeight*0.32,window.innerHeight*0.44,window.innerHeight*0.56,window.innerHeight*0.68]
-            for (let i=0;i<lanestarts.length;i++) {
-                if (mousepos[1]>=lanestarts[i] && mousepos[1]<laneends[i]) {
-                    lanein = i+1
-                }
-            }
-            if (lanein > 0) {
-                let newleftnote
-                let topofnote = ((0.08*window.innerHeight)+(lanein*window.innerHeight*0.12))
-                if (gridon == 1) {
-                    newleftnote = roundDownNearest(indicOffset, gridscale, mousepos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
-                } else {
-                    newleftnote = mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
-                }
-                ghostNoteTo(newleftnote, topofnote)
+    if (songisplaying == 0) {
+        if (noteclickmoveoverride == 3) {
+            let newleftnote
+            if (gridon == 1) {
+                newleftnote = roundDownNearest(indicOffset, gridscale, mousepos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
             } else {
-                ghostNoteTo(-1500, -1500)
+                newleftnote = mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+            }
+            longGhostSetup(longusing, (newleftnote-Number(longusing.style.left.replace("px",""))))
+        } else {
+            if (document.getElementById("musicplayerinput").files[0]) {
+                let lanein = 0
+                let lanestarts = [window.innerHeight*0.2,window.innerHeight*0.32,window.innerHeight*0.44,window.innerHeight*0.56]
+                let laneends = [window.innerHeight*0.32,window.innerHeight*0.44,window.innerHeight*0.56,window.innerHeight*0.68]
+                for (let i=0;i<lanestarts.length;i++) {
+                    if (mousepos[1]>=lanestarts[i] && mousepos[1]<laneends[i]) {
+                        lanein = i+1
+                    }
+                }
+                if (lanein > 0) {
+                    let newleftnote
+                    let topofnote = ((0.08*window.innerHeight)+(lanein*window.innerHeight*0.12))
+                    if (gridon == 1) {
+                        newleftnote = roundDownNearest(indicOffset - nearestSecondOff, gridscale, mousepos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+                    } else {
+                        newleftnote = mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+                    }
+                    ghostNoteTo(newleftnote, topofnote)
+                    ghostnoteat = [newleftnote, lanein]
+                } else {
+                    ghostNoteTo(-1500, -1500)
+                    ghostnoteat = [-1500, -1500]
+                }
             }
         }
+    } else {
+        ghostNoteTo(-1500, -1500)
+        ghostnoteat = [-1500, -1500]
     }
 }, 30)
 
