@@ -461,6 +461,7 @@ function keyFired(keyindex) {
     } else {
         // let noteattempt = 0
         let notefound = "None"
+        let noteFoundID = undefined // As long as the noteFound check holds, this shouldn't throw an error
         let availnotes = document.getElementsByClassName("noteobjectactive")
         let closestpos = 10000000
         if (availnotes.length > 0) {
@@ -468,6 +469,7 @@ function keyFired(keyindex) {
                 if (Number(songdata.songs[songplaying][1][Number(availnotes[i].id.replace("note",""))][1]) == Number(keyindex)) {
                     if (Number(availnotes[i].style.left.replace("px","")) < closestpos) {
                         notefound = availnotes[i]
+                        noteFoundID = Number(notefound.id.replace("note",""))
                         closestpos = Number(availnotes[i].style.left.replace("px",""))
                     }
                 }
@@ -476,9 +478,9 @@ function keyFired(keyindex) {
                 notefound = "None"
         }
         if (notefound != "None") {
-            if (songdata.songs[songplaying][1][Number(notefound.id.replace("note",""))][2] && songdata.songs[songplaying][1][Number(notefound.id.replace("note",""))][2] != 0) {
+            if (songdata.songs[songplaying][1][noteFoundID][2] && songdata.songs[songplaying][1][noteFoundID][2] != 0) {
                 inholdnotes[keyindex-1] = true
-                startHoldNote(keyindex-1, Number(notefound.id.replace("note","")))
+                startHoldNote(keyindex-1, noteFoundID)
             } else {
             }
             let nearpointsgained = (((pixelspersecond*noteforgiveness)- Math.abs(Number(notefound.style.left.replace("px",""))-93))*(1/(pixelspersecond*(noteforgiveness/830)))) // where the magic happens (future me doesnt know how the fuck this part works)
