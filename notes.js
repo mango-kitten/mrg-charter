@@ -82,16 +82,12 @@ function keyUp(evt) {
         }
     } else if (evt.keyCode==32) {
         spacePlay()
+    } else if (evt.keyCode==37) {
+        trackSong(1)
+    } else if (evt.keyCode==39) {
+        seekSong(1)
     }
 }
-
-// function scoreNoise(steps) {
-//     let noisereturned = []
-//     noisereturned[0] = (Math.random()/(steps))
-//     for (let i=1;i<steps;i++) {
-//     }
-//     return noisereturned
-// }
 
 function changeScore(added) {
     //let noisevals = scoreNoise(Math.round(Math.random()*5)+2)

@@ -18,7 +18,7 @@ let noteforgiveness = 0.4
 let startdelay = 0
 // ==END CONFIG==
 
-let enginever = "0.1.2"
+let enginever = "0.1.3"
 
 let combomulti = 1
 
@@ -269,7 +269,6 @@ document.addEventListener('mousedown', function (event) {
                                 }
                             }
                         } else {
-                            console.log(ghostnoteat)
                             leftofnote = ghostnoteat[0]
                             topofnote = ((0.08*window.innerHeight)+(ghostnoteat[1]*window.innerHeight*0.12)) // i should do a touches() for ghost note to set ghostnoteat = [-1, -1] if touching existing note
                             let noteslen = document.getElementById("noteholder").children.length
@@ -396,7 +395,7 @@ setInterval( function () {
         if (noteclickmoveoverride == 3) {
             let newleftnote
             if (gridon == 1) {
-                newleftnote = roundDownNearest(indicOffset, gridscale, mousepos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
+                newleftnote = roundDownNearest(indicOffset - nearestSecondOff, gridscale, mousepos[0]) + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
             } else {
                 newleftnote = mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)
             }
@@ -635,7 +634,7 @@ function insertBeatDrop() {
     } else {
         leftofnote = (mousepos[0]-(window.innerHeight*0.015)+(Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)) + ((Number(document.getElementById("musicplayer").currentTime)+startdelay)*pixelspersecond)
     }
-    let object = document.getElementById("secondholder").appendChild(document.getElementById("objectstorer").getElementsByClassName("beatdropobject")[0].cloneNode(true))
+    const object = document.getElementById("secondholder").appendChild(document.getElementById("objectstorer").getElementsByClassName("beatdropobject")[0].cloneNode(true))
     object.style.left = `${leftofnote - ((Number(document.getElementById("musicplayer").currentTime)+startdelay)*pixelspersecond)}px`
     object.style.top = `20vh`
     object.classList = "beatdropobject beatdropobjectfin"
@@ -791,9 +790,11 @@ function fullImport() {
                 songplaying = songdata.songs.length - 1
                 setTimeout( function () {
                     clearNotes()
+                    clearBeats()
                 }, 100)
                 setTimeout( function () {
                     buildNotes()
+                    buildBeatDrops()
                 }, 200)
             }
             console.log(newsongdata)
@@ -809,9 +810,11 @@ setInterval( function () {
         lastsongplaying = songplaying
         setTimeout( function () {
             clearNotes()
+            clearBeats()
         }, 100)
         setTimeout( function () {
             buildNotes()
+            buildBeatDrops()
         }, 200)
     }
 }, 1000)
@@ -828,12 +831,28 @@ function buildNotes() {
         }
     }
 }
+function buildBeatDrops() {
+    for (let i=0;i<songdata.songs[songplaying][4].length;i++) {
+        let beatslen = document.getElementById("secondholder").getElementsByClassName("beatdropobject").length
+        const beatobj = document.getElementById("secondholder").appendChild(document.getElementById("objectstorer").getElementsByClassName("beatdropobject")[0].cloneNode(true))
+        beatobj.classList = "beatdropobject beatdropobjectfin"
+        beatobj.style.top = `20vh`
+        beatobj.style.left = `${songdata.songs[songplaying][4][i] - ((Number(document.getElementById("musicplayer").currentTime)+startdelay)*pixelspersecond)}px`
+        beatobj.id = `beat${beatslen}`
+    }
+}
 
 // https://stackoverflow.com/a/22966637
 function clearNotes() {
     let node = document.getElementById("noteholder")
     var cNode = node.cloneNode(false);
     node.parentNode.replaceChild(cNode, node);
+}
+function clearBeats() {
+    let node = document.getElementById("secondholder")
+    var cNode = node.cloneNode(false)
+    node.parentNode.replaceChild(cNode, node)
+    setUpSeconds()
 }
 
 
