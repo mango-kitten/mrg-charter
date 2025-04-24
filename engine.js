@@ -86,39 +86,53 @@ let lastactions = [] // [actiontype, oldpos, newpos, elemid] actiontype 0 = plac
 function undoLast() {
     let newestaction = lastactions.length - 1
     if (newestaction >= 0) {
-        if (lastactions[newestaction][0] == 0) {
-            let deletionnum = document.getElementById("noteholder").children.length
-            let notedeleted = document.getElementById("noteholder").children[deletionnum-1]
-            notedeleted.remove()
-            songdata.songs[songplaying][1].pop()
-            lastactions.pop()
-        } else if (lastactions[newestaction][0] == 1) {
-            const noteused = document.getElementById(lastactions[newestaction][3])
-            noteused.style.left = `${lastactions[newestaction][1] + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)}px`
-            songdata.songs[songplaying][1][Number(lastactions[newestaction][3].replace("note",""))][0] = lastactions[newestaction][1]
-            lastactions.pop()
-        } else if (lastactions[newestaction][0] == 2) {
-            let newtopnote = ((0.08*window.innerHeight)+(lastactions[newestaction][1]*window.innerHeight*0.12))
-            const noteused = document.getElementById(lastactions[newestaction][3])
-            noteused.style.top = `${newtopnote}px`
-            songdata.songs[songplaying][1][Number(lastactions[newestaction][3].replace("note", ""))][1] = lastactions[newestaction][1]
-            lastactions.pop()
-        } else if (lastactions[newestaction][0] == 3) {
-            let oldtop = ((0.08*window.innerHeight)+(lastactions[newestaction][1][1]*window.innerHeight*0.12))
-            let noteslen = document.getElementById("noteholder").children.length
-            const noteobj = document.getElementById(`noteholder`).appendChild(document.getElementsByClassName("noteobject")[0].cloneNode(true))
-            noteobj.style.top = `${oldtop}px`
-            noteobj.style.left = `${lastactions[newestaction][1][0]}px`
-            noteobj.id = `note${noteslen}`
-            notepx = Number(noteobj.style.left.replace("px","")) + ((Number(document.getElementById("musicplayer").currentTime)+startdelay)*pixelspersecond)
-            songdata.songs[songplaying][1].push([notepx, lastactions[newestaction][1][1]])
-            lastactions.pop()
-        } else if (lastactions[newestaction][0] == 4) {
-            let deletionnum = document.getElementById("secondholder").getElementsByClassName("beatdropobject").length
-            let beatdeleted = document.getElementById("secondholder").getElementsByClassName("beatdropobject")[deletionnum-1]
-            beatdeleted.remove()
-            songdata.songs[songplaying][4].pop()
-            lastactions.pop()
+        let deletionnum = null;
+        let noteused = null;
+
+        switch (lastactions[newestaction][0]) {
+            case 0:
+                deletionnum = document.getElementById("noteholder").children.length
+                let notedeleted = document.getElementById("noteholder").children[deletionnum-1]
+                notedeleted.remove()
+                songdata.songs[songplaying][1].pop()
+                lastactions.pop()
+                break
+
+            case 1:
+                noteused = document.getElementById(lastactions[newestaction][3])
+                noteused.style.left = `${lastactions[newestaction][1] + (Number(document.getElementById("noteholder").style.left.replace("px",""))*-1)}px`
+                songdata.songs[songplaying][1][Number(lastactions[newestaction][3].replace("note",""))][0] = lastactions[newestaction][1]
+                lastactions.pop()
+                break
+            
+            case 2:
+                let newtopnote = ((0.08*window.innerHeight)+(lastactions[newestaction][1]*window.innerHeight*0.12))
+                noteused = document.getElementById(lastactions[newestaction][3])
+                noteused.style.top = `${newtopnote}px`
+                songdata.songs[songplaying][1][Number(lastactions[newestaction][3].replace("note", ""))][1] = lastactions[newestaction][1]
+                lastactions.pop()
+                break
+
+            case 3:
+                let oldtop = ((0.08*window.innerHeight)+(lastactions[newestaction][1][1]*window.innerHeight*0.12))
+                let noteslen = document.getElementById("noteholder").children.length
+                const noteobj = document.getElementById(`noteholder`).appendChild(document.getElementsByClassName("noteobject")[0].cloneNode(true))
+                noteobj.style.top = `${oldtop}px`
+                noteobj.style.left = `${lastactions[newestaction][1][0]}px`
+                noteobj.id = `note${noteslen}`
+                notepx = Number(noteobj.style.left.replace("px","")) + ((Number(document.getElementById("musicplayer").currentTime)+startdelay)*pixelspersecond)
+                songdata.songs[songplaying][1].push([notepx, lastactions[newestaction][1][1]])
+                lastactions.pop()
+                break
+
+            case 4:
+                deletionnum = document.getElementById("secondholder").getElementsByClassName("beatdropobject").length
+                let beatdeleted = document.getElementById("secondholder").getElementsByClassName("beatdropobject")[deletionnum-1]
+                beatdeleted.remove()
+                songdata.songs[songplaying][4].pop()
+                lastactions.pop()
+                break
+            
         }
     }
 }
@@ -145,24 +159,36 @@ function toggleGrid() {
     }
 }
 function adjustGrid() {
-    if (gridscale == pixelspersecond/8) {
-        gridscale = pixelspersecond/10
-        document.getElementsByClassName("musicplayergridchange")[0].innerHTML = "1/10 sec"
-    } else if (gridscale == pixelspersecond/10) {
-        gridscale = pixelspersecond/16
-        document.getElementsByClassName("musicplayergridchange")[0].innerHTML = "1/16 sec"
-    } else if (gridscale == pixelspersecond/16) {
-        gridscale = pixelspersecond/32
-        document.getElementsByClassName("musicplayergridchange")[0].innerHTML = "1/32 sec"
-    } else if (gridscale == pixelspersecond/32) {
-        gridscale = pixelspersecond/4
-        document.getElementsByClassName("musicplayergridchange")[0].innerHTML = "1/4 sec"
-    } else if (gridscale == pixelspersecond/4) {
-        gridscale = pixelspersecond/6
-        document.getElementsByClassName("musicplayergridchange")[0].innerHTML = "1/6 sec"
-    } else if (gridscale == pixelspersecond/6) {
-        gridscale = pixelspersecond/8
-        document.getElementsByClassName("musicplayergridchange")[0].innerHTML = "1/8 sec"
+    switch (gridscale) {
+        case pixelspersecond/8:
+            gridscale = pixelspersecond/10
+            document.getElementsByClassName("musicplayergridchange")[0].innerHTML = "1/10 sec"
+            break
+        
+        case pixelspersecond/10:
+            gridscale = pixelspersecond/16
+            document.getElementsByClassName("musicplayergridchange")[0].innerHTML = "1/16 sec"
+            break
+
+        case pixelspersecond/16:
+            gridscale = pixelspersecond/32
+            document.getElementsByClassName("musicplayergridchange")[0].innerHTML = "1/32 sec"
+            break
+
+        case pixelspersecond/32:
+            gridscale = pixelspersecond/4
+            document.getElementsByClassName("musicplayergridchange")[0].innerHTML = "1/4 sec"
+            break
+
+        case pixelspersecond/4:
+            gridscale = pixelspersecond/6
+            document.getElementsByClassName("musicplayergridchange")[0].innerHTML = "1/6 sec"
+            break
+
+        case pixelspersecond/6:
+            gridscale = pixelspersecond/8
+            document.getElementsByClassName("musicplayergridchange")[0].innerHTML = "1/8 sec"
+            break
     }
 }
 
@@ -486,6 +512,7 @@ function keyFired(keyindex) {
     } else {
         // let noteattempt = 0
         let notefound = "None"
+        let noteFoundID = undefined // As long as the noteFound check holds, this shouldn't throw an error
         let availnotes = document.getElementsByClassName("noteobjectactive")
         let closestpos = 10000000
         if (availnotes.length > 0) {
@@ -493,6 +520,7 @@ function keyFired(keyindex) {
                 if (Number(songdata.songs[songplaying][1][Number(availnotes[i].id.replace("note",""))][1]) == Number(keyindex)) {
                     if (Number(availnotes[i].style.left.replace("px","")) < closestpos) {
                         notefound = availnotes[i]
+                        noteFoundID = Number(notefound.id.replace("note",""))
                         closestpos = Number(availnotes[i].style.left.replace("px",""))
                     }
                 }
@@ -501,9 +529,9 @@ function keyFired(keyindex) {
                 notefound = "None"
         }
         if (notefound != "None") {
-            if (songdata.songs[songplaying][1][Number(notefound.id.replace("note",""))][2] && songdata.songs[songplaying][1][Number(notefound.id.replace("note",""))][2] != 0) {
+            if (songdata.songs[songplaying][1][noteFoundID][2] && songdata.songs[songplaying][1][noteFoundID][2] != 0) {
                 inholdnotes[keyindex-1] = true
-                startHoldNote(keyindex-1, Number(notefound.id.replace("note","")))
+                startHoldNote(keyindex-1, noteFoundID)
             } else {
             }
             let nearpointsgained = (((pixelspersecond*noteforgiveness)- Math.abs(Number(notefound.style.left.replace("px",""))-93))*(1/(pixelspersecond*(noteforgiveness/830)))) // where the magic happens (future me doesnt know how the fuck this part works)
